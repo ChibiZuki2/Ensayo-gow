@@ -42,12 +42,31 @@ body{background:var(--bg);color:var(--text);font-family:'Inter',sans-serif;trans
 .title-divider{width:80px;height:1px;background:linear-gradient(90deg,transparent,var(--accent-light),transparent);margin:10px auto 0;animation:titleIn 1.3s ease both}
 @keyframes titleIn{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
 
-/* CHIBI */
+/* CHIBI — sticky sobre la barra de controles, patitas en el borde */
 .controls-wrap{position:relative;z-index:5}
 
-/* La chibi flota fija en la esquina superior derecha de la VENTANA */
-.chibi-fixed{position:fixed;top:12px;right:16px;z-index:99;display:flex;flex-direction:column;align-items:flex-end;pointer-events:none}
-.chibi-wrap{pointer-events:all;position:relative;display:inline-block}
+/*
+  chibi-fixed: contenedor sticky que se "pega" justo encima de la barra.
+  height:0 + overflow:visible → no empuja el contenido pero la chibi asoma.
+  El z-index:11 la pone sobre la barra (z-index:10).
+*/
+.chibi-fixed{
+  position:sticky;
+  top:0;
+  z-index:11;
+  height:0;
+  overflow:visible;
+  pointer-events:none;
+}
+.chibi-wrap{
+  pointer-events:all;
+  position:absolute;
+  right:20px;
+  bottom:0;           /* se ancla desde abajo = pegada al borde superior de la barra */
+  display:inline-flex;
+  flex-direction:column;
+  align-items:center;
+}
 
 /* Halo de luz pulsante detrás de la chibi */
 .chibi-glow{
@@ -61,7 +80,7 @@ body{background:var(--bg);color:var(--text);font-family:'Inter',sans-serif;trans
   50%{transform:scale(1.18);opacity:1}
 }
 
-/* Partículas flotantes alrededor */
+/* Partículas flotantes */
 .chibi-sparkle{
   position:absolute;width:6px;height:6px;border-radius:50%;pointer-events:none;z-index:0;
   animation:sparkleDrift 4s ease-in-out infinite
@@ -72,48 +91,72 @@ body{background:var(--bg);color:var(--text);font-family:'Inter',sans-serif;trans
   100%{opacity:0;transform:translate(var(--dx),var(--dy)) scale(1.4)}
 }
 
+/* Imagen chibi — bottom negativo para que las patitas toquen el borde */
 .chibi-img{
-  height:135px;width:auto;object-fit:contain;position:relative;z-index:1;
+  height:128px;width:auto;object-fit:contain;
+  position:relative;z-index:1;
+  margin-bottom:-6px;   /* patitas "sujetan" el borde de la barra */
   filter:drop-shadow(0 0 12px rgba(201,168,232,.55)) drop-shadow(0 4px 18px rgba(80,30,120,.45));
   transition:filter .35s ease,transform .35s ease;
   cursor:pointer;display:block;
   animation:chibiIn 1s ease both
 }
-@keyframes chibiIn{from{opacity:0;transform:translateY(-22px)}to{opacity:1;transform:none}}
+@keyframes chibiIn{from{opacity:0;transform:translateY(-20px)}to{opacity:1;transform:none}}
 
-/* Hover: sube, brilla y hace wobble */
 .chibi-img:hover{
   filter:drop-shadow(0 0 22px rgba(201,168,232,.9)) drop-shadow(0 6px 24px rgba(150,80,210,.6));
   transform:translateY(-8px) scale(1.07);
-  animation:chibiWobble .5s ease
+  animation:chibiWobble .55s ease
 }
 @keyframes chibiWobble{
-  0%{transform:translateY(-8px) scale(1.07) rotate(0deg)}
-  25%{transform:translateY(-9px) scale(1.07) rotate(-2deg)}
-  50%{transform:translateY(-8px) scale(1.07) rotate(2deg)}
-  75%{transform:translateY(-9px) scale(1.07) rotate(-1deg)}
+  0%  {transform:translateY(-8px) scale(1.07) rotate(0deg)}
+  25% {transform:translateY(-9px) scale(1.07) rotate(-2.5deg)}
+  50% {transform:translateY(-8px) scale(1.07) rotate(2.5deg)}
+  75% {transform:translateY(-9px) scale(1.07) rotate(-1deg)}
   100%{transform:translateY(-8px) scale(1.07) rotate(0deg)}
 }
-.chibi-img:active{transform:scale(.93);filter:drop-shadow(0 0 8px rgba(201,168,232,.4))}
+.chibi-img:active{transform:scale(.92) translateY(-2px);transition:transform .1s}
 
-/* BURBUJA CHIBI */
+/* BURBUJA — ancha, con flecha apuntando a la chibi */
 .chibi-bubble{
-  position:absolute;right:145px;top:18px;
-  background:rgba(15,9,26,.93);
+  position:absolute;
+  right:calc(100% + 14px);  /* a la izquierda de la chibi */
+  bottom:18px;              /* alineada con la parte baja */
+  background:rgba(15,9,26,.95);
   border:.5px solid var(--accent);
   border-radius:14px 14px 14px 4px;
-  padding:9px 14px;font-size:12px;
+  padding:12px 20px;
+  font-size:13px;
   color:var(--accent-light);
   pointer-events:none;
-  opacity:0;transform:scale(.82) translateX(8px);
+  opacity:0;
+  transform:scale(.85) translateX(10px);
   transition:opacity .25s,transform .25s;
-  z-index:8;max-width:200px;
-  white-space:normal;text-align:center;line-height:1.5;
-  box-shadow:0 4px 20px rgba(123,94,167,.3)
+  z-index:12;
+  width:240px;          /* ancho generoso y fijo */
+  white-space:normal;
+  text-align:center;
+  line-height:1.65;
+  box-shadow:0 4px 24px rgba(123,94,167,.35);
+}
+/* Flecha que apunta hacia la derecha (la chibi) */
+.chibi-bubble::after{
+  content:"";
+  position:absolute;
+  right:-8px;bottom:18px;
+  border:7px solid transparent;
+  border-left-color:var(--accent);
+  border-right:none;
 }
 .chibi-bubble.show{opacity:1;transform:scale(1) translateX(0)}
+
 /* Easter egg especial */
-.chibi-bubble.egg{border-color:#FFB6E6;color:#FFB6E6;background:rgba(60,10,40,.95);animation:eggPulse 1.8s ease infinite}
+.chibi-bubble.egg{
+  border-color:#FFB6E6;color:#FFB6E6;
+  background:rgba(60,10,40,.96);
+  animation:eggPulse 1.8s ease infinite
+}
+.chibi-bubble.egg::after{border-left-color:#FFB6E6}
 @keyframes eggPulse{0%,100%{box-shadow:0 0 0 rgba(255,182,230,0)}50%{box-shadow:0 0 22px rgba(255,182,230,.5)}}
 
 /* CONTROLS BAR */
