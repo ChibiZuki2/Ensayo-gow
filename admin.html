@@ -92,6 +92,16 @@ body.locked .wrap{display:none}
 .song-item .song-info .si-title{font-size:13px;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .song-item .song-info .si-id{font-size:11px;color:var(--text2)}
 .refresh-row{display:flex;justify-content:flex-end;margin-bottom:.8rem}
+
+/* ==== LIVE PREVIEW CARD ==== */
+.live-preview-card{border:.5px solid var(--border-c);background:var(--bg2);border-radius:14px;overflow:hidden;max-width:230px}
+.lp-img-wrap{position:relative;width:100%;height:150px;background:#1c1626;display:flex;align-items:center;justify-content:center}
+.lp-img-wrap img{width:100%;height:100%;object-fit:cover;display:none}
+.lp-img-empty{font-size:30px;opacity:.5}
+.lp-body{padding:8px 12px 10px}
+.lp-title{font-size:13px;font-weight:600;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.lp-artist{font-size:11px;color:var(--text2);margin-top:2px}
+.lp-foot{display:flex;align-items:center;justify-content:space-between;margin-top:6px}
 </style>
 </head>
 <body class="locked">
@@ -148,21 +158,21 @@ body.locked .wrap{display:none}
     </div>
     <div class="field" style="margin-top:1.2rem;">
       <label>Título del fanart</label>
-      <input type="text" id="f-titulo" placeholder="Ej: LadyGowi en su cumpleaños"/>
+      <input type="text" id="f-titulo" placeholder="Ej: LadyGowi en su cumpleaños" oninput="updateLivePreview()"/>
     </div>
     <div class="row2">
       <div class="field">
         <label>Artista</label>
-        <input type="text" id="f-artista" placeholder="@usuario_artista"/>
+        <input type="text" id="f-artista" placeholder="@usuario_artista" oninput="updateLivePreview()"/>
       </div>
       <div class="field">
         <label>Categoría</label>
-        <select id="f-categoria"></select>
+        <select id="f-categoria" onchange="updateLivePreview()"></select>
       </div>
     </div>
     <div class="field">
       <label>Dedicatoria / nota de la creadora (opcional)</label>
-      <textarea id="f-nota" placeholder="Ej: Imagen enviada por @artista para mi cumpleaños, ¡muchas gracias!"></textarea>
+      <textarea id="f-nota" placeholder="Ej: Imagen enviada por @artista para mi cumpleaños, ¡muchas gracias!" oninput="updateLivePreview()"></textarea>
     </div>
     <div class="checkbox-row" style="margin-bottom:1.2rem;">
       <input type="checkbox" id="f-destacado"/>
@@ -170,11 +180,32 @@ body.locked .wrap{display:none}
     </div>
     <button class="btn-primary" id="publish-btn" onclick="publish()">Publicar en la galería</button>
     <div id="log"></div>
+
+    <div class="panel-title" style="margin-top:1.6rem;font-size:13px;">👁️ Así se verá en la galería</div>
+    <div class="live-preview-card" id="live-preview-card">
+      <div class="lp-img-wrap"><img id="lp-img" alt=""/><div class="lp-img-empty" id="lp-img-empty">🌸</div></div>
+      <div class="lp-body">
+        <div class="lp-title" id="lp-title">Título del fanart</div>
+        <div class="lp-artist" id="lp-artist">@artista</div>
+        <div class="lp-foot">
+          <span class="card-cat" id="lp-cat">categoría</span>
+          <span class="card-date">Hoy</span>
+        </div>
+      </div>
+    </div>
   </div>
 
   <div class="panel" id="manage-panel">
     <div class="panel-title">📂 Imágenes publicadas</div>
     <div class="refresh-row"><button class="btn-secondary" onclick="loadGalleryManage()">↻ Actualizar lista</button></div>
+    <div class="row2" style="margin-bottom:1rem;">
+      <div class="field" style="margin:0;">
+        <input type="text" id="manage-search" placeholder="Buscar por título o artista..." oninput="filterManageList()"/>
+      </div>
+      <div class="field" style="margin:0;">
+        <select id="manage-cat-filter" onchange="filterManageList()"><option value="all">Todas las categorías</option></select>
+      </div>
+    </div>
     <div id="manage-list"><div class="manage-empty">Conecta tu token y pulsa "Actualizar lista" para ver las imágenes.</div></div>
   </div>
 
@@ -263,6 +294,7 @@ let CATEGORIES=["fanart","emotes","memes"];
 function renderCatSelect(){
   const sel=document.getElementById("f-categoria"); sel.innerHTML="";
   CATEGORIES.forEach(c=>{ const o=document.createElement("option"); o.value=o.textContent=c; sel.appendChild(o); });
+  if(typeof updateLivePreview==="function") updateLivePreview();
 }
 function renderCatChips(){
   const wrap=document.getElementById("cat-chips"); wrap.innerHTML="";
@@ -303,8 +335,21 @@ function handleFile(file){
     document.getElementById("preview-name").textContent=currentFile.name;
     document.getElementById("dropzone-empty").style.display="none";
     document.getElementById("preview-wrap").classList.add("show");
+    updateLivePreview();
   };
   reader.readAsDataURL(file);
+}
+function updateLivePreview(){
+  const titulo=document.getElementById("f-titulo").value.trim();
+  const artista=document.getElementById("f-artista").value.trim();
+  const categoria=document.getElementById("f-categoria").value;
+  const previewSrc=document.getElementById("preview-img").src;
+  document.getElementById("lp-title").textContent=titulo||"Título del fanart";
+  document.getElementById("lp-artist").textContent=artista?("@"+artista.replace(/^@/,"")):"@artista";
+  document.getElementById("lp-cat").textContent=categoria||"categoría";
+  const lpImg=document.getElementById("lp-img"), lpEmpty=document.getElementById("lp-img-empty");
+  if(previewSrc && previewSrc.startsWith("data:")){ lpImg.src=previewSrc; lpImg.style.display="block"; lpEmpty.style.display="none"; }
+  else{ lpImg.style.display="none"; lpEmpty.style.display="block"; }
 }
 function sanitizeFilename(name){
   return Date.now()+"-"+name.toLowerCase().replace(/[^a-z0-9.\-]/g,"-").replace(/-+/g,"-");
@@ -358,8 +403,35 @@ async function loadGalleryManage(){
 function renderManageList(items){
   const box=document.getElementById("manage-list");
   if(!items.length){ box.innerHTML='<div class="manage-empty">Aún no hay imágenes publicadas.</div>'; return; }
+  populateManageCatFilter(items);
+  applyManageFilter(items);
+}
+
+function populateManageCatFilter(items){
+  const sel=document.getElementById("manage-cat-filter");
+  const current=sel.value||"all";
+  const cats=Array.from(new Set(items.map(i=>i.categoria))).sort();
+  sel.innerHTML='<option value="all">Todas las categorías</option>';
+  cats.forEach(c=>{ const o=document.createElement("option"); o.value=o.textContent=c; sel.appendChild(o); });
+  sel.value=cats.includes(current)?current:"all";
+}
+
+function filterManageList(){
+  if(window._galleryItems) applyManageFilter(window._galleryItems);
+}
+
+function applyManageFilter(items){
+  const box=document.getElementById("manage-list");
+  const q=(document.getElementById("manage-search").value||"").trim().toLowerCase();
+  const cat=document.getElementById("manage-cat-filter").value;
+  const filtered=items.filter(it=>{
+    const matchesCat = cat==="all" || it.categoria===cat;
+    const matchesQ = !q || it.titulo.toLowerCase().includes(q) || it.artista.toLowerCase().includes(q);
+    return matchesCat && matchesQ;
+  });
+  if(!filtered.length){ box.innerHTML='<div class="manage-empty">No se encontraron imágenes con ese filtro/búsqueda.</div>'; return; }
   box.innerHTML="";
-  items.forEach(it=>{
+  filtered.forEach(it=>{
     const thumb=`https://${cfg.owner}.github.io/${cfg.repo}/${it.src}`;
     const div=document.createElement("div");
     div.innerHTML=`
@@ -572,6 +644,8 @@ async function publish(){
     document.getElementById("preview-wrap").classList.remove("show");
     ["f-titulo","f-artista","f-nota"].forEach(id=>document.getElementById(id).value="");
     document.getElementById("f-destacado").checked=false;
+    document.getElementById("preview-img").src="";
+    updateLivePreview();
     loadGalleryManage();
 
   }catch(e){ logLine("✕ Error: "+e.message,"err"); }
