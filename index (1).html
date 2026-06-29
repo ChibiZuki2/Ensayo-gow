@@ -1,0 +1,591 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>LadyGowi — Fanart Archive</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600&family=Inter:wght@300;400;500&display=swap" rel="stylesheet" />
+  <style>
+    /* =============================================
+       PALETAS DE COLOR — edita los colores aquí
+       ============================================= */
+    :root {
+      /* Paleta activa por defecto */
+      --bg:           #110D1A;
+      --bg2:          #1E1428;
+      --card:         #1A1025;
+      --border-c:     #2E1F45;
+      --text:         #E8E0F5;
+      --text2:        #A87FD4;
+      --accent:       #7B5EA7;
+      --accent-light: #C9A8E8;
+      --tag-bg:       #1E1428;
+      --tag-border:   #7B5EA7;
+      --tag-text:     #C9A8E8;
+      --tag-act-bg:   #7B5EA7;
+      --tag-act-text: #E8E0F5;
+    }
+    .theme-lavender {
+      --bg:           #F5F0FF;
+      --bg2:          #EDE5FF;
+      --card:         #FFFFFF;
+      --border-c:     #D4C0F0;
+      --text:         #2A1A4A;
+      --text2:        #6B42A0;
+      --accent:       #8B5FC9;
+      --accent-light: #8B5FC9;
+      --tag-bg:       #EDE5FF;
+      --tag-border:   #B99DE0;
+      --tag-text:     #4A2D7A;
+      --tag-act-bg:   #8B5FC9;
+      --tag-act-text: #F5F0FF;
+    }
+    .theme-midnight {
+      --bg:           #0A0A0F;
+      --bg2:          #131320;
+      --card:         #0F0F1E;
+      --border-c:     #2A1A4A;
+      --text:         #D4AAFF;
+      --text2:        #9B5DE5;
+      --accent:       #6A30C8;
+      --accent-light: #D4AAFF;
+      --tag-bg:       #131320;
+      --tag-border:   #6A30C8;
+      --tag-text:     #D4AAFF;
+      --tag-act-bg:   #6A30C8;
+      --tag-act-text: #D4AAFF;
+    }
+
+    /* =============================================
+       BASE
+       ============================================= */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'Inter', sans-serif;
+      transition: background 0.4s, color 0.4s;
+      min-height: 100vh;
+    }
+
+    /* =============================================
+       BANNER — reemplaza banner.jpg con tu imagen
+       ============================================= */
+    .banner {
+      position: relative;
+      width: 100%;
+      height: 340px;
+      overflow: hidden;
+      display: flex;
+      align-items: flex-end;
+      justify-content: center;
+    }
+    .banner-img {
+      position: absolute;
+      inset: 0;
+      width: 100%; height: 100%;
+      object-fit: cover;
+      object-position: center top;
+      opacity: 0.55;
+    }
+    /* Gradiente que oscurece el banner hacia abajo para que el título se lea bien */
+    .banner::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(to bottom, transparent 30%, var(--bg) 100%);
+    }
+    /* Fallback si no hay imagen de banner */
+    .banner-fallback {
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(135deg, #1E1428 0%, #2E1A50 50%, #110D1A 100%);
+    }
+    .banner-content {
+      position: relative;
+      z-index: 2;
+      text-align: center;
+      padding: 0 1rem 2rem;
+      width: 100%;
+    }
+
+    /* =============================================
+       HEADER / LOGO
+       ============================================= */
+    .site-title {
+      font-family: 'Cinzel', serif;
+      font-size: clamp(28px, 6vw, 48px);
+      font-weight: 600;
+      color: var(--text);
+      letter-spacing: 0.1em;
+      line-height: 1;
+      /* ✏️ EDITABLE: cambia el nombre aquí o en el HTML abajo */
+    }
+    .site-title span { color: var(--accent-light); }
+    .site-sub {
+      font-size: 13px;
+      color: var(--text2);
+      letter-spacing: 0.15em;
+      margin-top: 6px;
+      /* ✏️ EDITABLE: cambia el subtítulo aquí o en el HTML abajo */
+    }
+
+    /* =============================================
+       CONTROLES — paletas y ordenamiento
+       ============================================= */
+    .controls {
+      background: var(--bg2);
+      border-bottom: 0.5px solid var(--border-c);
+      padding: 0.875rem 1rem;
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 0.75rem;
+      position: sticky;
+      top: 0;
+      z-index: 10;
+      transition: background 0.4s;
+    }
+    .controls-left { display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap; }
+    .controls-right { display: flex; align-items: center; gap: 0.5rem; }
+
+    /* Paleta switcher */
+    .pal-label { font-size: 11px; color: var(--text2); letter-spacing: 0.05em; }
+    .pal-btn {
+      width: 22px; height: 22px; border-radius: 50%;
+      border: 2px solid transparent;
+      cursor: pointer; transition: transform 0.15s, border-color 0.2s;
+      flex-shrink: 0;
+    }
+    .pal-btn:hover { transform: scale(1.2); }
+    .pal-btn.active { border-color: var(--text); }
+    .pal-btn[data-t="dark"]     { background: linear-gradient(135deg,#110D1A,#7B5EA7); }
+    .pal-btn[data-t="lavender"] { background: linear-gradient(135deg,#E2D4F7,#8B5FC9); }
+    .pal-btn[data-t="midnight"] { background: linear-gradient(135deg,#0A0A0F,#9B5DE5); }
+
+    /* Sort button */
+    .sort-btn {
+      font-size: 12px;
+      padding: 4px 12px;
+      border-radius: 20px;
+      border: 0.5px solid var(--tag-border);
+      background: var(--tag-bg);
+      color: var(--tag-text);
+      cursor: pointer;
+      transition: all 0.15s;
+      font-family: 'Inter', sans-serif;
+    }
+    .sort-btn.active, .sort-btn:hover {
+      background: var(--tag-act-bg);
+      color: var(--tag-act-text);
+    }
+
+    /* =============================================
+       FILTROS DE CATEGORÍA
+       ============================================= */
+    .filter-bar {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      padding: 1rem 1rem 0.5rem;
+      align-items: center;
+    }
+    .filter-label { font-size: 11px; color: var(--text2); letter-spacing: 0.04em; margin-right: 4px; }
+    .tag {
+      font-size: 12px;
+      padding: 5px 16px;
+      border-radius: 20px;
+      border: 0.5px solid var(--tag-border);
+      color: var(--tag-text);
+      background: var(--tag-bg);
+      cursor: pointer;
+      transition: all 0.15s;
+      font-family: 'Inter', sans-serif;
+      user-select: none;
+    }
+    .tag.active, .tag:hover {
+      background: var(--tag-act-bg);
+      color: var(--tag-act-text);
+    }
+
+    /* =============================================
+       STATS
+       ============================================= */
+    .stats {
+      display: flex;
+      gap: 1.5rem;
+      padding: 0.5rem 1rem 1rem;
+      align-items: center;
+    }
+    .stat-n {
+      font-size: 18px; font-weight: 500;
+      color: var(--accent-light);
+      font-family: 'Cinzel', serif;
+    }
+    .stat-l { font-size: 11px; color: var(--text2); letter-spacing: 0.04em; }
+    .lock-pill {
+      margin-left: auto;
+      font-size: 11px;
+      padding: 3px 12px;
+      border-radius: 20px;
+      border: 0.5px solid var(--tag-border);
+      color: var(--tag-text);
+      background: var(--tag-bg);
+    }
+
+    /* =============================================
+       GALERÍA MASONRY
+       ============================================= */
+    .masonry-wrap { padding: 0.5rem 1rem 2rem; }
+    .masonry {
+      column-count: 3;
+      column-gap: 10px;
+    }
+    @media (max-width: 600px) { .masonry { column-count: 2; } }
+    @media (max-width: 380px) { .masonry { column-count: 1; } }
+
+    .card {
+      break-inside: avoid;
+      margin-bottom: 10px;
+      border-radius: 12px;
+      overflow: hidden;
+      border: 0.5px solid var(--border-c);
+      background: var(--card);
+      transition: transform 0.2s, border-color 0.2s;
+      cursor: pointer;
+    }
+    .card:hover {
+      transform: translateY(-4px);
+      border-color: var(--accent);
+    }
+    .card img {
+      width: 100%;
+      display: block;
+      border-radius: 0;
+    }
+    /* Placeholder mientras carga — se oculta cuando la imagen carga */
+    .card-placeholder {
+      width: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 28px;
+      background: var(--bg2);
+    }
+    .card-body { padding: 8px 12px 10px; }
+    .card-title { font-size: 13px; font-weight: 500; color: var(--text); }
+    .card-artist { font-size: 11px; color: var(--text2); margin-top: 2px; }
+    .card-foot {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-top: 6px;
+    }
+    .card-cat {
+      font-size: 10px;
+      padding: 2px 9px;
+      border-radius: 10px;
+      background: var(--tag-bg);
+      color: var(--tag-text);
+      border: 0.5px solid var(--tag-border);
+    }
+    .card-date { font-size: 10px; color: var(--text2); }
+
+    /* =============================================
+       LIGHTBOX (ver imagen grande al hacer clic)
+       ============================================= */
+    .lightbox {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(10, 5, 20, 0.92);
+      z-index: 100;
+      align-items: center;
+      justify-content: center;
+      padding: 1rem;
+    }
+    .lightbox.open { display: flex; }
+    .lightbox img {
+      max-width: 90vw;
+      max-height: 85vh;
+      border-radius: 12px;
+      border: 0.5px solid var(--border-c);
+    }
+    .lightbox-close {
+      position: absolute;
+      top: 1rem; right: 1rem;
+      font-size: 28px;
+      color: var(--text2);
+      cursor: pointer;
+      background: none;
+      border: none;
+      line-height: 1;
+    }
+    .lightbox-info {
+      position: absolute;
+      bottom: 1.5rem;
+      text-align: center;
+      color: var(--text);
+    }
+    .lightbox-info h3 { font-size: 15px; font-weight: 500; }
+    .lightbox-info p { font-size: 13px; color: var(--text2); margin-top: 3px; }
+
+    /* =============================================
+       FOOTER
+       ============================================= */
+    footer {
+      text-align: center;
+      padding: 1.5rem;
+      border-top: 0.5px solid var(--border-c);
+      font-size: 11px;
+      color: var(--text2);
+      letter-spacing: 0.04em;
+    }
+    footer span { display: block; margin-top: 4px; opacity: 0.6; }
+
+    /* =============================================
+       EMPTY STATE
+       ============================================= */
+    .empty {
+      text-align: center;
+      padding: 4rem 1rem;
+      color: var(--text2);
+      display: none;
+    }
+    .empty-icon { font-size: 40px; margin-bottom: 1rem; }
+    .empty-text { font-size: 14px; }
+  </style>
+</head>
+<body id="app">
+
+  <!-- =============================================
+       BANNER
+       Reemplaza "assets/banner.jpg" con tu imagen
+       ============================================= -->
+  <div class="banner">
+    <div class="banner-fallback"></div>
+    <!-- Descomenta la línea de abajo y sube tu imagen a la carpeta assets/ -->
+    <!-- <img class="banner-img" src="assets/banner.jpg" alt="LadyGowi banner" /> -->
+    <div class="banner-content">
+      <!-- ✏️ EDITABLE: nombre del sitio -->
+      <div class="site-title">Lady<span>Gowi</span></div>
+      <!-- ✏️ EDITABLE: subtítulo -->
+      <div class="site-sub">✦ Fanart & Art Archive ✦</div>
+    </div>
+  </div>
+
+  <!-- =============================================
+       BARRA DE CONTROLES (sticky)
+       ============================================= -->
+  <div class="controls">
+    <div class="controls-left">
+      <span class="pal-label">Paleta:</span>
+      <div class="pal-btn active" data-t="dark"     title="Dark Demoness" onclick="setTheme(this,'dark')"></div>
+      <div class="pal-btn"        data-t="lavender" title="Lavender Dream" onclick="setTheme(this,'lavender')"></div>
+      <div class="pal-btn"        data-t="midnight" title="Midnight Goth"  onclick="setTheme(this,'midnight')"></div>
+    </div>
+    <div class="controls-right">
+      <button class="sort-btn active" id="sort-new" onclick="setSort('new')">🕐 Más nuevos</button>
+      <button class="sort-btn"        id="sort-old" onclick="setSort('old')">🕐 Más antiguos</button>
+    </div>
+  </div>
+
+  <!-- =============================================
+       FILTROS DE CATEGORÍA
+       ✏️ EDITABLE: agrega o quita categorías aquí
+       Solo agrega un nuevo <span class="tag"> con
+       el mismo formato. El data-cat debe coincidir
+       con el data-cat de las tarjetas abajo.
+       ============================================= -->
+  <div class="filter-bar">
+    <span class="filter-label">FILTRAR:</span>
+    <span class="tag active" data-cat="all"    onclick="filterTag(this)">Todos</span>
+    <span class="tag"        data-cat="fanart" onclick="filterTag(this)">Fanart</span>
+    <span class="tag"        data-cat="emotes" onclick="filterTag(this)">Emotes</span>
+    <span class="tag"        data-cat="memes"  onclick="filterTag(this)">Memes</span>
+    <!-- ✏️ Para agregar una categoría nueva, copia esta línea y cambia data-cat y el texto: -->
+    <!-- <span class="tag" data-cat="chibi" onclick="filterTag(this)">Chibi</span> -->
+  </div>
+
+  <!-- Stats -->
+  <div class="stats">
+    <div>
+      <div class="stat-n" id="count">0</div>
+      <div class="stat-l">IMÁGENES</div>
+    </div>
+    <div>
+      <div class="stat-n" id="artist-count">0</div>
+      <div class="stat-l">ARTISTAS</div>
+    </div>
+    <span class="lock-pill">🔒 Solo con link</span>
+  </div>
+
+  <!-- =============================================
+       GALERÍA
+       ============================================= -->
+  <div class="masonry-wrap">
+    <div class="masonry" id="masonry"></div>
+    <div class="empty" id="empty">
+      <div class="empty-icon">🐑</div>
+      <div class="empty-text">No hay imágenes en esta categoría aún.</div>
+    </div>
+  </div>
+
+  <!-- Lightbox -->
+  <div class="lightbox" id="lightbox" onclick="closeLightbox(event)">
+    <button class="lightbox-close" onclick="closeLightbox()">✕</button>
+    <img id="lb-img" src="" alt="" />
+    <div class="lightbox-info">
+      <h3 id="lb-title"></h3>
+      <p id="lb-artist"></p>
+    </div>
+  </div>
+
+  <!-- =============================================
+       FOOTER
+       ✏️ EDITABLE: cambia el texto del pie de página
+       ============================================= -->
+  <footer>
+    ✦ LadyGowi Fanart Archive ✦
+    <span>Todos los artes pertenecen a sus respectivos artistas · Hecho con 💜</span>
+  </footer>
+
+  <!-- =============================================
+       IMÁGENES — AQUÍ AGREGAS CADA FANART
+       
+       Para agregar una imagen nueva, copia un bloque
+       { ... } dentro del array IMAGENES y edita:
+       
+       - src:      ruta de la imagen (ej: "imagenes/fanart01.jpg")
+       - titulo:   nombre que aparece en la tarjeta
+       - artista:  nombre del artista (ej: "@nombre")
+       - categoria: debe coincidir con el data-cat del filtro
+                    opciones: "fanart" | "emotes" | "memes"
+       - fecha:    formato "YYYY-MM-DD" (año-mes-día)
+                   se usa para ordenar por más nuevos
+       - placeholder: emoji que aparece mientras carga (opcional)
+       ============================================= -->
+  <script>
+    const IMAGENES = [
+      // ✏️ EJEMPLO — reemplaza con tus imágenes reales
+      {
+        src:        "imagenes/ejemplo01.jpg",
+        titulo:     "Ejemplo fanart 1",
+        artista:    "@artista",
+        categoria:  "fanart",
+        fecha:      "2026-05-01",
+        placeholder:"🎨"
+      },
+      {
+        src:        "imagenes/ejemplo02.jpg",
+        titulo:     "Ejemplo emote",
+        artista:    "@emoteartist",
+        categoria:  "emotes",
+        fecha:      "2026-05-10",
+        placeholder:"✨"
+      },
+      {
+        src:        "imagenes/ejemplo03.jpg",
+        titulo:     "Ejemplo meme",
+        artista:    "@mememaster",
+        categoria:  "memes",
+        fecha:      "2026-05-20",
+        placeholder:"😂"
+      },
+      // Agrega más aquí siguiendo el mismo formato...
+    ];
+
+    /* =============================================
+       LÓGICA — no necesitas editar nada de aquí abajo
+       ============================================= */
+    let currentCat  = 'all';
+    let currentSort = 'new';
+
+    function renderGallery() {
+      let imgs = [...IMAGENES];
+
+      if (currentCat !== 'all') {
+        imgs = imgs.filter(i => i.categoria === currentCat);
+      }
+
+      imgs.sort((a, b) => {
+        const da = new Date(a.fecha), db = new Date(b.fecha);
+        return currentSort === 'new' ? db - da : da - db;
+      });
+
+      const masonry = document.getElementById('masonry');
+      const empty   = document.getElementById('empty');
+      masonry.innerHTML = '';
+
+      if (imgs.length === 0) {
+        empty.style.display = 'block';
+      } else {
+        empty.style.display = 'none';
+        imgs.forEach(img => {
+          const card = document.createElement('div');
+          card.className = 'card';
+          card.innerHTML = `
+            <div class="card-placeholder" style="height:160px;">${img.placeholder || '🌸'}</div>
+            <img src="${img.src}" alt="${img.titulo}" style="display:none;"
+                 onload="this.previousElementSibling.style.display='none'; this.style.display='block';"
+                 onerror="this.style.display='none';" />
+            <div class="card-body">
+              <div class="card-title">${img.titulo}</div>
+              <div class="card-artist">${img.artista}</div>
+              <div class="card-foot">
+                <span class="card-cat">${img.categoria}</span>
+                <span class="card-date">${img.fecha}</span>
+              </div>
+            </div>
+          `;
+          card.onclick = () => openLightbox(img);
+          masonry.appendChild(card);
+        });
+      }
+
+      document.getElementById('count').textContent = imgs.length;
+      const artistas = new Set(IMAGENES.map(i => i.artista)).size;
+      document.getElementById('artist-count').textContent = artistas;
+    }
+
+    function filterTag(el) {
+      document.querySelectorAll('.tag').forEach(t => t.classList.remove('active'));
+      el.classList.add('active');
+      currentCat = el.dataset.cat;
+      renderGallery();
+    }
+
+    function setSort(s) {
+      currentSort = s;
+      document.getElementById('sort-new').classList.toggle('active', s === 'new');
+      document.getElementById('sort-old').classList.toggle('active', s === 'old');
+      renderGallery();
+    }
+
+    function setTheme(btn, theme) {
+      const app = document.getElementById('app');
+      app.className = theme === 'dark' ? '' : 'theme-' + theme;
+      document.querySelectorAll('.pal-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+    }
+
+    function openLightbox(img) {
+      document.getElementById('lb-img').src     = img.src;
+      document.getElementById('lb-title').textContent  = img.titulo;
+      document.getElementById('lb-artist').textContent = img.artista;
+      document.getElementById('lightbox').classList.add('open');
+    }
+
+    function closeLightbox(e) {
+      if (!e || e.target === document.getElementById('lightbox') || e.target.classList.contains('lightbox-close')) {
+        document.getElementById('lightbox').classList.remove('open');
+      }
+    }
+
+    document.addEventListener('keydown', e => { if (e.key === 'Escape') closeLightbox(); });
+    renderGallery();
+  </script>
+</body>
+</html>
