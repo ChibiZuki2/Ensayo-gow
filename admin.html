@@ -234,6 +234,29 @@ body.locked .wrap{display:none}
     </div>
     <button class="btn-primary" onclick="addSong()">Agregar canción</button>
   </div>
+
+  <div class="panel" id="sounds-panel">
+    <div class="panel-title">🐑 Sonidos (chibi y campana)</div>
+    <div class="refresh-row"><button class="btn-secondary" onclick="loadSoundsManage()">↻ Actualizar lista</button></div>
+    <div id="sounds-list"><div class="manage-empty">Conecta tu token y pulsa "Actualizar lista" para ver los sonidos.</div></div>
+    <div class="field" style="margin-top:1rem;">
+      <label>Nombre del sonido</label>
+      <input type="text" id="sound-nombre" placeholder="Ej: Oveja contenta"/>
+    </div>
+    <div class="field">
+      <label>¿Dónde suena?</label>
+      <select id="sound-tipo">
+        <option value="chibi">Al tocar la chibi (se elige uno al azar)</option>
+        <option value="campana">Al tocar el título/campana (se elige uno al azar)</option>
+      </select>
+    </div>
+    <div class="field">
+      <label>Archivo de audio (mp3)</label>
+      <input type="file" id="sound-file" accept="audio/mp3,audio/mpeg"/>
+      <div class="hint">Se sube a la carpeta sonidos/ de tu repositorio.</div>
+    </div>
+    <button class="btn-primary" onclick="addSound()">Agregar sonido</button>
+  </div>
 </div>
 
 <script>
@@ -578,6 +601,92 @@ async function addSong(){
   }catch(e){ alert("Error al agregar: "+e.message); }
 }
 
+/* ==== GESTIONAR SONIDOS ==== */
+const SOUND_LINE_RE=/^(\s*)\{\s*tipo:"((?:\\.|[^"\\])*)",\s*nombre:"((?:\\.|[^"\\])*)",\s*archivo:"((?:\\.|[^"\\])*)"\s*\},?\s*$/;
+
+async function loadSoundsManage(){
+  const box=document.getElementById("sounds-list");
+  if(!cfg.token){ box.innerHTML='<div class="manage-empty" style="color:var(--err)">Conecta tu token primero.</div>'; return; }
+  box.innerHTML='<div class="manage-empty">Cargando...</div>';
+  try{
+    const file=await getFile("index.html");
+    window._idxFile=file;
+    const content=base64ToUtf8(file.content);
+    window._idxLines=content.split("\n");
+    const sounds=[];
+    window._idxLines.forEach((line,i)=>{
+      const m=line.match(SOUND_LINE_RE);
+      if(m) sounds.push({lineIndex:i,tipo:m[2],nombre:unesc(m[3]),archivo:m[4]});
+    });
+    window._soundItems=sounds;
+    renderSoundsList(sounds);
+  }catch(e){ box.innerHTML=`<div class="manage-empty" style="color:var(--err)">Error: ${e.message}</div>`; }
+}
+
+function renderSoundsList(sounds){
+  const box=document.getElementById("sounds-list");
+  if(!sounds.length){ box.innerHTML='<div class="manage-empty">No hay sonidos aún.</div>'; return; }
+  box.innerHTML="";
+  sounds.forEach(s=>{
+    const div=document.createElement("div");
+    div.className="song-item";
+    const tipoLabel = s.tipo==="chibi" ? "🐑 Chibi" : "🔔 Título/campana";
+    div.innerHTML=`
+      <div class="song-info">
+        <div class="si-title">${tipoLabel} — ${s.nombre}</div>
+        <div class="si-id">${s.archivo}</div>
+      </div>
+      <button class="icon-btn" title="Escuchar" onclick="new Audio('https://${cfg.owner}.github.io/${cfg.repo}/${s.archivo}').play()">▶</button>
+      <button class="icon-btn danger" title="Eliminar" onclick="deleteSound(${s.lineIndex})">🗑</button>`;
+    box.appendChild(div);
+  });
+}
+
+async function deleteSound(lineIndex){
+  const sound=window._soundItems.find(x=>x.lineIndex===lineIndex);
+  const sameType=window._soundItems.filter(x=>x.tipo===sound.tipo);
+  if(sameType.length<=1){ alert(`Debe quedar al menos un sonido de tipo "${sound.tipo}".`); return; }
+  if(!confirm(`¿Eliminar el sonido "${sound.nombre}"? (el archivo de audio seguirá en el repositorio, solo se quita de la lista)`)) return;
+  try{
+    const lines=window._idxLines.slice(); lines.splice(lineIndex,1);
+    await putFile("index.html",utf8ToBase64(lines.join("\n")),`Elimina sonido: ${sound.nombre}`,window._idxFile.sha);
+    await loadSoundsManage();
+  }catch(e){ alert("Error al eliminar: "+e.message); }
+}
+
+async function addSound(){
+  if(!cfg.token){ alert("Conecta tu token primero."); return; }
+  const nombre=document.getElementById("sound-nombre").value.trim();
+  const tipo=document.getElementById("sound-tipo").value;
+  const fileInput=document.getElementById("sound-file");
+  const file=fileInput.files[0];
+  if(!nombre||!file){ alert("Escribe un nombre y selecciona un archivo de audio."); return; }
+  try{
+    const base64 = await new Promise((res,rej)=>{
+      const reader=new FileReader();
+      reader.onload=e=>res(e.target.result.split(",")[1]);
+      reader.onerror=rej;
+      reader.readAsDataURL(file);
+    });
+    const cleanName = Date.now()+"-"+file.name.toLowerCase().replace(/[^a-z0-9.\-]/g,"-").replace(/-+/g,"-");
+    const soundPath = `sonidos/${cleanName}`;
+    await putFile(soundPath, base64, `Sube sonido: ${nombre}`);
+
+    const idxFile=await getFile("index.html");
+    const content=base64ToUtf8(idxFile.content);
+    const marker="const SONIDOS = [\n";
+    const idx=content.indexOf(marker);
+    if(idx===-1) throw new Error("No se encontró el array SONIDOS.");
+    const newLine=`  { tipo:"${tipo}", nombre:"${esc(nombre)}", archivo:"${soundPath}" },\n`;
+    const newContent=content.slice(0,idx+marker.length)+newLine+content.slice(idx+marker.length);
+    await putFile("index.html",utf8ToBase64(newContent),`Agrega sonido: ${nombre}`,idxFile.sha);
+
+    document.getElementById("sound-nombre").value="";
+    fileInput.value="";
+    await loadSoundsManage();
+  }catch(e){ alert("Error al agregar: "+e.message); }
+}
+
 /* ==== LOG ==== */
 function logLine(text,type="info"){
   const log=document.getElementById("log"); log.classList.add("show");
@@ -652,7 +761,7 @@ async function publish(){
   finally{ btn.disabled=false; btn.textContent="Publicar en la galería"; }
 }
 
-if(cfg.token){ loadCategoriesFromRepo(); loadGalleryManage(); loadMusicManage(); }
+if(cfg.token){ loadCategoriesFromRepo(); loadGalleryManage(); loadMusicManage(); loadSoundsManage(); }
 </script>
 </body>
 </html>
