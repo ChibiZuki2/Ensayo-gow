@@ -516,12 +516,9 @@ const CANCIONES = [
    tipo: "chibi" (suena random al tocar la chibi) o "campana" (suena al tocar el título/campana)
    ============================ */
 const SONIDOS = [
-  { tipo:"campana", nombre:"Campanita", archivo:"sonidos/1782791519526-freesound-community-sheep-bells-30542.mp3" },
-  { tipo:"campana", nombre:"Campanita", archivo:"sonidos/1782791516887-freesound-community-sheep-bells-30542.mp3" },
-  { tipo:"chibi", nombre:"Ovejita", archivo:"sonidos/1782791459751-stu9-small-sheep-352868.mp3" },
-  { tipo:"chibi",   nombre:"Oveja pequeña", archivo:"sonidos/small-sheep.mp3" },
-  { tipo:"chibi",   nombre:"Oveja grande",  archivo:"sonidos/monsheep.mp3" },
-  { tipo:"campana", nombre:"Campanas",      archivo:"sonidos/sheep-bells.mp3" },
+  { tipo:"chibi",   nombre:"Oveja pequeña", archivo:"sonidos/small-sheep.mp3", peso:1 },
+  { tipo:"chibi",   nombre:"Oveja grande",  archivo:"sonidos/monsheep.mp3",    peso:1 },
+  { tipo:"campana", nombre:"Campanas",      archivo:"sonidos/sheep-bells.mp3", peso:1 },
 ];
 
 /* ============================
@@ -602,14 +599,15 @@ const IMAGENES = [
   }
 })();
 
-/* ==== CHIBI — FRASES + EASTER EGG ==== */
+/* ==== CHIBI — FRASES + EASTER EGG ====
+   ✏️ peso: número que indica qué tan seguido sale esa frase (peso más alto = más probable) */
 const CHIBI_FRASES = [
-  "¡Hola! 💜",
-  "¡Gracias por venir a verme! 🌸",
-  "¿Qué dice una cereza cuando se ve al espejo? ¿Seré esa? 🍒 ¡¡JAJA!!",
-  "Shhh… no hagas ruido, mis corderitos duermen 🐑💤",
-  "¡Espero verte en mi stream! 🎀",
-  "🎈 wekito",
+  { texto:"¡Hola! 💜", peso:1 },
+  { texto:"¡Gracias por venir a verme! 🌸", peso:1 },
+  { texto:"¿Qué dice una cereza cuando se ve al espejo? ¿Seré esa? 🍒 ¡¡JAJA!!", peso:1 },
+  { texto:"Shhh… no hagas ruido, mis corderitos duermen 🐑💤", peso:1 },
+  { texto:"¡Espero verte en mi stream! 🎀", peso:1 },
+  { texto:"🎈 wekito", peso:1 },
 ];
 /* ==== INDICADOR "EN VIVO" DE TWITCH ====
    Cambia este nombre por el canal real de Twitch de LadyGowi: */
@@ -652,24 +650,38 @@ const CHIBI_EGG = "✨ Shhh… sólo tú sabes esto: eres mi favorito favorito �
 /* ==== SONIDOS DE OVEJA (chibi y campana) ==== */
 let _audioCache = {};
 function playSound(src){
+  if(!src) return;
+  src = src.trim();
   try{
     if(!_audioCache[src]) _audioCache[src] = new Audio(src);
     const a = _audioCache[src];
     a.currentTime = 0;
     a.volume = 0.7;
-    a.play().catch(()=>{});
-  }catch(e){}
+    a.play().catch(err=>console.warn("No se pudo reproducir el sonido:", src, "—", err.message));
+  }catch(e){ console.warn("Error al cargar sonido:", src, "—", e.message); }
+}
+/* Elige un elemento al azar respetando su "peso" (peso mayor = más probable) */
+function weightedPick(arr){
+  if(!arr.length) return null;
+  const total = arr.reduce((s,x)=>s+(x.peso||1), 0);
+  let r = Math.random()*total;
+  for(const item of arr){
+    r -= (item.peso||1);
+    if(r<=0) return item;
+  }
+  return arr[arr.length-1];
 }
 function playRandomSheep(){
   const opts = SONIDOS.filter(s=>s.tipo==="chibi");
-  if(!opts.length) return;
-  playSound(opts[Math.floor(Math.random()*opts.length)].archivo);
+  const pick = weightedPick(opts);
+  if(pick) playSound(pick.archivo);
 }
 
 /* ==== CLIC EN EL TÍTULO ==== */
 function titleClick(){
   const opts = SONIDOS.filter(s=>s.tipo==="campana");
-  if(opts.length) playSound(opts[Math.floor(Math.random()*opts.length)].archivo);
+  const pick = weightedPick(opts);
+  if(pick) playSound(pick.archivo);
   const bell = document.getElementById("title-bell");
   const title = document.getElementById("site-title");
   bell.classList.remove("ring");    void bell.offsetWidth;    bell.classList.add("ring");
@@ -685,7 +697,7 @@ function chibiClick() {
 
   // Easter egg 1% de probabilidad
   const isEgg = Math.random() < 0.01;
-  const msg   = isEgg ? CHIBI_EGG : CHIBI_FRASES[Math.floor(Math.random() * CHIBI_FRASES.length)];
+  const msg   = isEgg ? CHIBI_EGG : weightedPick(CHIBI_FRASES).texto;
 
   bubble.textContent = msg;
   bubble.className   = "chibi-bubble" + (isEgg ? " egg" : "");
