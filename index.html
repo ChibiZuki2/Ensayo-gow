@@ -30,7 +30,29 @@ body{background:var(--bg);color:var(--text);font-family:'Inter',sans-serif;trans
 .page-section.active{display:block}
 @keyframes sectionIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
 
-/* ===== LORE ===== */
+/* ===== FONDO GRADIENTE ANIMADO (57) ===== */
+body::before{content:'';position:fixed;inset:0;z-index:-1;background:linear-gradient(235deg,#0f0917,#1a0d2e,#120820,#0d0619,#1e1035,#0f0917);background-size:400% 400%;animation:bgShift 22s ease infinite;pointer-events:none}
+@keyframes bgShift{0%{background-position:0% 50%}50%{background-position:100% 50%}100%{background-position:0% 50%}}
+
+/* ===== GLOW EN CARDS (58) ===== */
+.card{break-inside:avoid;margin-bottom:10px;border-radius:14px;overflow:hidden;border:.5px solid var(--border-c);background:var(--card);transition:transform .25s,border-color .25s,box-shadow .35s,opacity .5s;cursor:pointer;position:relative;opacity:0;transform:translateY(16px)}
+.card:hover{border-color:rgba(168,85,247,.6);box-shadow:0 0 0 1px rgba(168,85,247,.2),0 8px 30px rgba(123,94,167,.35),0 0 40px rgba(168,85,247,.12)}
+
+/* ===== VINILO GIRATORIO (48) ===== */
+.vinyl-wrap{position:relative;flex-shrink:0;width:36px;height:36px;cursor:pointer}
+.vinyl{width:36px;height:36px;border-radius:50%;background:conic-gradient(#1a0d2e 0%,#2d1b4e 25%,#1a0d2e 50%,#2d1b4e 75%,#1a0d2e 100%);border:2px solid rgba(201,168,232,.3);display:flex;align-items:center;justify-content:center;transition:box-shadow .3s}
+.vinyl::after{content:'';width:10px;height:10px;border-radius:50%;background:radial-gradient(circle,var(--accent-light),var(--accent));box-shadow:0 0 6px var(--accent-light)}
+.vinyl.spinning{animation:vinylSpin 2s linear infinite;box-shadow:0 0 12px rgba(168,85,247,.5)}
+@keyframes vinylSpin{from{transform:rotate(0deg)}to{transform:rotate(360deg)}}
+
+/* ===== TICK ANIMATION EN REGLAS (74) ===== */
+.rule-item{position:relative}
+
+/* ===== CHIBI IDLE (100) ===== */
+#idle-bubble{position:fixed;z-index:60;pointer-events:none;opacity:0;transition:opacity .4s;transform:translateY(8px);transition:opacity .4s,transform .4s}
+#idle-bubble.show{opacity:1;transform:translateY(0)}
+#idle-bubble .ib-inner{background:var(--card);border:.5px solid rgba(168,85,247,.4);border-radius:14px;padding:8px 14px;font-size:12px;color:var(--text);max-width:200px;text-align:center;box-shadow:0 4px 20px rgba(123,94,167,.3)}
+#idle-bubble .ib-arrow{width:0;height:0;border-left:8px solid transparent;border-right:8px solid transparent;border-top:8px solid rgba(168,85,247,.4);margin:0 auto}
 .lore-wrap{max-width:720px;margin:0 auto;padding:2rem 1rem}
 .lore-card{background:var(--card);border:.5px solid var(--border-c);border-radius:18px;padding:1.8rem 2rem;margin-bottom:1.2rem}
 .lore-card h3{font-family:'Cinzel',serif;font-size:15px;color:var(--accent-light);letter-spacing:.1em;margin-bottom:1rem;display:flex;align-items:center;gap:8px}
@@ -42,37 +64,70 @@ body{background:var(--bg);color:var(--text);font-family:'Inter',sans-serif;trans
 
 /* ===== REGLAS ===== */
 .rules-wrap{max-width:720px;margin:0 auto;padding:2rem 1rem}
-.rule-item{display:flex;gap:14px;align-items:flex-start;background:var(--card);border:.5px solid var(--border-c);border-radius:14px;padding:1rem 1.2rem;margin-bottom:10px;transition:border-color .2s,transform .2s}
-.rule-item:hover{border-color:var(--accent);transform:translateX(4px)}
-.rule-item.highlight{border-color:rgba(168,85,247,.5);background:rgba(168,85,247,.08)}
-.rule-num{width:30px;height:30px;border-radius:50%;background:linear-gradient(135deg,var(--accent),var(--accent-light));color:#fff;font-size:12px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;box-shadow:0 0 10px rgba(168,85,247,.4)}
-.rule-text{font-size:13px;color:var(--text2);line-height:1.7}
-.rule-text strong{color:var(--text);font-weight:600}
-.rule-text .sub{display:block;font-size:11.5px;color:var(--accent-light);margin-top:3px;font-style:italic}
-.rules-footer{margin-top:1.6rem;background:rgba(168,85,247,.08);border:.5px solid rgba(168,85,247,.3);border-radius:14px;padding:1rem 1.2rem}
-.rules-footer .rf-pd{font-size:12px;color:var(--text2);margin-bottom:.5rem}
-.rules-footer .rf-note{font-size:11.5px;color:var(--accent-light);font-style:italic;line-height:1.6}
+.rule-item{display:flex;gap:14px;align-items:flex-start;background:var(--card);border:.5px solid var(--border-c);border-left:3px solid var(--accent);border-radius:0 14px 14px 0;padding:1rem 1.2rem;margin-bottom:10px;transition:border-color .2s,transform .2s,box-shadow .2s}
+.rule-item:hover{border-left-color:var(--accent-light);transform:translateX(5px);box-shadow:0 4px 16px rgba(123,94,167,.2)}
+.rule-item.highlight{border-left-color:#FF9EC4;background:rgba(255,158,196,.06)}
+.rule-item.highlight:hover{border-left-color:#FF9EC4;box-shadow:0 4px 16px rgba(255,158,196,.2)}
+.rule-num{width:32px;height:32px;border-radius:50%;background:linear-gradient(135deg,var(--accent),var(--accent-light));color:#fff;font-size:12px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;box-shadow:0 0 12px rgba(168,85,247,.4)}
+.rule-item.highlight .rule-num{background:linear-gradient(135deg,#D85A8C,#FF9EC4)}
+.rule-text{font-size:13px;color:var(--text2);line-height:1.75}
+.rule-text strong{color:var(--text);font-weight:600;display:block;margin-bottom:2px}
+.rule-text .sub{display:block;font-size:11.5px;color:var(--accent-light);margin-top:4px;font-style:italic}
+.rule-item.highlight .rule-text .sub{color:#FF9EC4}
+.rules-footer{margin-top:1.8rem;background:rgba(168,85,247,.07);border:.5px solid rgba(168,85,247,.3);border-radius:14px;padding:1.1rem 1.3rem}
+.rules-footer .rf-pd{font-size:12.5px;color:var(--text2);margin-bottom:.6rem}
+.rules-footer .rf-note{font-size:12px;color:var(--accent-light);font-style:italic;line-height:1.7}
 .section-title{font-family:'Cinzel',serif;font-size:18px;color:var(--text);letter-spacing:.12em;text-align:center;margin-bottom:1.6rem;text-shadow:0 0 30px rgba(201,168,232,.3)}
 
 /* ===== JUEGOS ===== */
 .games-wrap{max-width:860px;margin:0 auto;padding:2rem 1rem}
-.games-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:14px}
-.game-card{background:var(--card);border:.5px solid var(--border-c);border-radius:16px;padding:1rem 1.1rem;transition:transform .2s,border-color .2s,box-shadow .2s;position:relative}
-.game-card:hover{transform:translateY(-4px);border-color:var(--accent);box-shadow:0 8px 24px rgba(123,94,167,.25)}
-.game-card .g-title{font-size:13.5px;font-weight:600;color:var(--text);margin-bottom:8px}
-.game-card .g-sheep-row{display:flex;gap:3px;align-items:center;margin-bottom:6px;flex-wrap:wrap}
-.game-card .g-sheep{width:28px;height:28px;object-fit:contain;animation:sheepBounce .4s ease both}
-.game-card .g-sheep:nth-child(2){animation-delay:.06s}
-.game-card .g-sheep:nth-child(3){animation-delay:.12s}
-.game-card .g-sheep:nth-child(4){animation-delay:.18s}
-.game-card .g-sheep:nth-child(5){animation-delay:.24s}
+.games-view-toggle{display:flex;justify-content:center;gap:8px;margin-bottom:1.4rem}
+.view-btn{padding:7px 20px;font-size:12px;letter-spacing:.06em;border-radius:30px;border:.5px solid var(--tag-border);background:var(--tag-bg);color:var(--text2);cursor:pointer;transition:all .2s;font-family:'Inter',sans-serif}
+.view-btn:hover{border-color:var(--accent);color:var(--text)}
+.view-btn.active{background:linear-gradient(135deg,rgba(168,85,247,.28),rgba(123,94,167,.2));color:var(--text);border-color:rgba(168,85,247,.5);box-shadow:0 0 12px rgba(168,85,247,.2)}
+.games-view{display:none}.games-view.active{display:block}
+
+/* Lista de juegos */
+.game-list{display:flex;flex-direction:column;gap:12px;margin-bottom:2.5rem}
+.game-row{display:flex;gap:14px;align-items:flex-start;background:var(--card);border:.5px solid var(--border-c);border-radius:16px;padding:12px;transition:transform .2s,border-color .2s,box-shadow .2s;overflow:hidden}
+.game-row:hover{transform:translateX(4px);border-color:var(--accent);box-shadow:0 4px 20px rgba(123,94,167,.2)}
+.game-row .g-cover{width:70px;height:90px;object-fit:cover;border-radius:10px;flex-shrink:0;background:var(--bg2)}
+.game-row .g-cover-empty{width:70px;height:90px;border-radius:10px;flex-shrink:0;background:var(--bg2);display:flex;align-items:center;justify-content:center;font-size:24px;border:.5px dashed var(--border-c)}
+.game-row .g-info{flex:1;min-width:0;display:flex;flex-direction:column;gap:5px}
+.game-row .g-title{font-size:14px;font-weight:700;color:var(--text);letter-spacing:.02em}
+.game-row .g-sheep-row{display:flex;gap:2px;align-items:center}
+.game-row .g-sheep{width:24px;height:24px;object-fit:contain;animation:sheepBounce .4s ease both}
+.game-row .g-sheep:nth-child(2){animation-delay:.06s}
+.game-row .g-sheep:nth-child(3){animation-delay:.12s}
+.game-row .g-sheep:nth-child(4){animation-delay:.18s}
+.game-row .g-sheep:nth-child(5){animation-delay:.24s}
+.game-row .g-score-label{font-size:10px;color:var(--text2);margin-left:5px}
+.game-row .g-desc{font-size:12px;color:var(--text2);line-height:1.6}
+.game-row .g-rec{font-size:11px;font-weight:600;padding:3px 10px;border-radius:20px;width:fit-content;margin-top:2px}
+.g-rec.si{color:#7ecb9e;background:rgba(126,203,158,.12);border:.5px solid rgba(126,203,158,.3)}
+.g-rec.no{color:#e07c7c;background:rgba(224,124,124,.12);border:.5px solid rgba(224,124,124,.3)}
+.g-rec.tal{color:#c9a8e8;background:rgba(201,168,232,.12);border:.5px solid rgba(201,168,232,.3)}
 @keyframes sheepBounce{from{opacity:0;transform:scale(.4) translateY(6px)}to{opacity:1;transform:scale(1) translateY(0)}}
-.game-card .g-score-label{font-size:10px;color:var(--text2);margin-left:4px;align-self:center}
-.game-card .g-rec{font-size:11px;margin-bottom:4px;font-weight:500}
-.game-card .g-note{font-size:11px;color:var(--text2);line-height:1.55}
-.g-rec.si{color:#7ecb9e}.g-rec.no{color:#e07c7c}.g-rec.tal{color:#c9a8e8}
-.games-legend{display:flex;gap:14px;justify-content:center;margin-bottom:1.4rem;font-size:11px;color:var(--text2);flex-wrap:wrap}
+
+/* Collage de juegos */
+.games-collage{display:grid;grid-template-columns:repeat(auto-fill,minmax(90px,1fr));gap:8px}
+.collage-item{position:relative;aspect-ratio:3/4;border-radius:10px;overflow:hidden;border:.5px solid var(--border-c);cursor:pointer;transition:transform .2s,box-shadow .2s}
+.collage-item:hover{transform:scale(1.05);box-shadow:0 6px 20px rgba(123,94,167,.4);z-index:2}
+.collage-item img{width:100%;height:100%;object-fit:cover}
+.collage-item .c-overlay{position:absolute;inset:0;background:linear-gradient(to top,rgba(10,5,20,.85) 0%,transparent 55%);opacity:0;transition:opacity .2s;display:flex;align-items:flex-end;padding:6px}
+.collage-item:hover .c-overlay{opacity:1}
+.collage-item .c-title{font-size:9px;color:#fff;line-height:1.3;font-weight:500}
+.collage-item-empty{aspect-ratio:3/4;border-radius:10px;background:var(--bg2);border:.5px dashed var(--border-c);display:flex;align-items:center;justify-content:center;font-size:20px;opacity:.4}
+.games-legend{display:flex;gap:14px;justify-content:center;margin-bottom:1rem;font-size:11px;color:var(--text2);flex-wrap:wrap}
 .games-legend span{display:flex;align-items:center;gap:4px}
+.sheep-scale{display:flex;align-items:center;gap:12px;background:var(--card);border:.5px solid var(--border-c);border-radius:30px;padding:8px 16px;margin-bottom:1.4rem;width:fit-content;margin-left:auto;margin-right:auto;flex-wrap:wrap;justify-content:center}
+.scale-title{font-size:11px;color:var(--accent-light);letter-spacing:.06em;font-weight:500;white-space:nowrap}
+.scale-bar{display:flex;align-items:center;gap:6px;flex-wrap:wrap}
+.scale-bar-item{display:flex;flex-direction:column;align-items:center;gap:1px}
+.scale-bar-item span:first-child{font-size:11px;letter-spacing:-2px;line-height:1}
+.scale-bar-num{font-size:9px;color:var(--text2);font-weight:600}
+.scale-bar-best .scale-bar-num{color:var(--accent-light)}
+.scale-bar-sep{color:var(--text2);font-size:10px;opacity:.5;margin-top:-4px}
 #surprise-flash{position:fixed;inset:0;z-index:997;pointer-events:none;opacity:0;background:radial-gradient(circle,rgba(201,168,232,.55),rgba(123,94,167,.25) 45%,transparent 75%)}
 #surprise-flash.fire{animation:surpriseFlash .6s ease}
 @keyframes surpriseFlash{0%{opacity:0;transform:scale(.4)}35%{opacity:1;transform:scale(1.05)}100%{opacity:0;transform:scale(1.6)}}
@@ -276,6 +331,15 @@ body{background:var(--bg);color:var(--text);font-family:'Inter',sans-serif;trans
 .pal-btn[data-t="midnight"]{background:linear-gradient(135deg,#0A0A0F,#9B5DE5)}
 .sort-btn{font-size:12px;padding:4px 12px;border-radius:20px;border:.5px solid var(--tag-border);background:var(--tag-bg);color:var(--tag-text);cursor:pointer;transition:all .15s;font-family:'Inter',sans-serif}
 .sort-btn.active,.sort-btn:hover{background:var(--tag-act-bg);color:var(--tag-act-text)}
+.search-bar-wrap{padding:.5rem 1rem 0;position:relative;z-index:1}
+.search-bar{display:flex;align-items:center;background:var(--card);border:.5px solid var(--border-c);border-radius:30px;padding:7px 14px;gap:8px;transition:border-color .2s,box-shadow .2s}
+.search-bar:focus-within{border-color:var(--accent);box-shadow:0 0 0 3px rgba(168,85,247,.12)}
+.search-bar .search-ico{font-size:13px;opacity:.5;flex-shrink:0}
+.search-bar input{flex:1;background:transparent;border:none;outline:none;color:var(--text);font-size:13px;font-family:'Inter',sans-serif}
+.search-bar input::placeholder{color:var(--text2);opacity:.7}
+.search-bar .search-clear{font-size:12px;color:var(--text2);cursor:pointer;opacity:0;transition:opacity .15s;background:none;border:none;padding:0}
+.search-bar:focus-within .search-clear{opacity:.7}
+.search-results-info{font-size:11px;color:var(--text2);padding:.3rem 1rem .1rem;min-height:18px}
 
 /* DESTACADOS */
 .featured-wrap{padding:1.1rem 1rem .3rem;position:relative;z-index:1;display:none}
@@ -486,6 +550,15 @@ input[type=range].mp-vol::-webkit-slider-thumb{-webkit-appearance:none;width:10p
     <div class="featured-track" id="featured-track"></div>
   </div>
 
+  <div class="search-bar-wrap">
+    <div class="search-bar">
+      <span class="search-ico">🔍</span>
+      <input type="text" id="fanart-search" placeholder="Buscar por título o artista..." oninput="onFanartSearch()"/>
+      <button class="search-clear" onclick="clearFanartSearch()">✕</button>
+    </div>
+  </div>
+  <div class="search-results-info" id="fanart-search-info"></div>
+
   <div class="filter-bar">
     <span class="filter-label">FILTRAR:</span>
     <span class="tag active" data-cat="all"    onclick="filterTag(this)">Todos</span>
@@ -519,15 +592,11 @@ input[type=range].mp-vol::-webkit-slider-thumb{-webkit-appearance:none;width:10p
     <div class="section-title">✦ Sobre LadyGowi ✦</div>
     <div class="lore-card">
       <h3>🐑 ¿Quién es LadyGowi?</h3>
-      <p>LadyGowi es una vtuber de habla hispana, conocida por su personalidad tierna y sus cuernos de oveja. Su comunidad, los "Gowitos", la acompañan en cada stream con mucho cariño. ¡Próximamente más lore aquí!</p>
+      <p id="lore-quien">Cargando...</p>
     </div>
     <div class="lore-card">
       <h3>💜 Metas</h3>
-      <div class="metas-grid">
-        <div class="meta-item"><div class="meta-ico">🎯</div><div class="meta-txt">Próximamente...</div></div>
-        <div class="meta-item"><div class="meta-ico">✨</div><div class="meta-txt">Próximamente...</div></div>
-        <div class="meta-item"><div class="meta-ico">🐑</div><div class="meta-txt">Próximamente...</div></div>
-      </div>
+      <div class="metas-grid" id="lore-metas"></div>
     </div>
   </div>
 </div>
@@ -540,22 +609,61 @@ input[type=range].mp-vol::-webkit-slider-thumb{-webkit-appearance:none;width:10p
       <span>✅ Recomienda</span>
       <span>❌ No recomienda</span>
       <span>🤔 Tal vez</span>
-      <span style="opacity:.6">🐑 = 1/5 &nbsp; 🐑🐑🐑🐑🐑 = 5/5</span>
     </div>
-    <div class="games-grid" id="games-grid"></div>
+    <div class="sheep-scale">
+      <span class="scale-title">Puntuación:</span>
+      <div class="scale-bar">
+        <div class="scale-bar-item"><span>🐑</span><span class="scale-bar-num">1</span></div>
+        <div class="scale-bar-sep">›</div>
+        <div class="scale-bar-item"><span>🐑🐑</span><span class="scale-bar-num">2</span></div>
+        <div class="scale-bar-sep">›</div>
+        <div class="scale-bar-item"><span>🐑🐑🐑</span><span class="scale-bar-num">3</span></div>
+        <div class="scale-bar-sep">›</div>
+        <div class="scale-bar-item"><span>🐑🐑🐑🐑</span><span class="scale-bar-num">4</span></div>
+        <div class="scale-bar-sep">›</div>
+        <div class="scale-bar-item scale-bar-best"><span>🐑🐑🐑🐑🐑</span><span class="scale-bar-num">5 💜</span></div>
+      </div>
+    </div>
+
+    <!-- Búsqueda -->
+    <div class="search-bar-wrap" style="margin-bottom:.5rem">
+      <div class="search-bar">
+        <span class="search-ico">🔍</span>
+        <input type="text" id="games-search" placeholder="Buscar juego..." oninput="onGamesSearch()"/>
+        <button class="search-clear" onclick="clearGamesSearch()">✕</button>
+      </div>
+    </div>
+    <div class="search-results-info" id="games-search-info"></div>
+
+    <!-- Toggle de vista -->
+    <div class="games-view-toggle">
+      <button class="view-btn active" id="gview-lista" onclick="switchGameView('lista')">📋 Lista</button>
+      <button class="view-btn" id="gview-collage" onclick="switchGameView('collage')">⊞ Ver todos</button>
+      <button class="view-btn" id="gview-sort" onclick="toggleGamesSort()" title="Ordenar por nota">🐑 Ordenar</button>
+    </div>
+
+    <!-- Vista: Lista -->
+    <div class="games-view active" id="games-view-lista">
+      <div class="game-list" id="game-list"></div>
+    </div>
+
+    <!-- Vista: Collage -->
+    <div class="games-view" id="games-view-collage">
+      <div class="games-collage" id="games-collage"></div>
+    </div>
   </div>
 </div>
 
 <!-- ===== SECCIÓN: REGLAS ===== -->
 <div class="page-section" id="tab-reglas">
   <div class="rules-wrap">
-    <div class="section-title">✦ Reglas de la Secta ✦</div>
+    <div class="section-title">✦ REGLAS ✦</div>
 
     <div class="rule-item">
       <div class="rule-num">1</div>
       <div class="rule-text"><strong>Sin insultos ni toxicidad.</strong> La secta debe ser un lugar agradable donde pertenecer. Trátenla con amor 💜</div>
     </div>
-    <div class="rule-item">
+    <div class="rule-item highlight">
       <div class="rule-num">2</div>
       <div class="rule-text"><strong>Sin contenido dañino.</strong> No hagas posts promoviendo violencia, fraudes, gore o contenido +18 sin consentimiento de la Gow o Mods.</div>
     </div>
@@ -563,7 +671,7 @@ input[type=range].mp-vol::-webkit-slider-thumb{-webkit-appearance:none;width:10p
       <div class="rule-num">3</div>
       <div class="rule-text"><strong>Sin spam ni publicidad.</strong> No publiques stream/discord/página u otros links que te beneficien de alguna forma.</div>
     </div>
-    <div class="rule-item">
+    <div class="rule-item highlight">
       <div class="rule-num">4</div>
       <div class="rule-text"><strong>No Spoilear.</strong> Si LadyGowi está jugando o viendo algo, guarda los spoilers para ti. 🤐</div>
     </div>
@@ -571,7 +679,7 @@ input[type=range].mp-vol::-webkit-slider-thumb{-webkit-appearance:none;width:10p
       <div class="rule-num">5</div>
       <div class="rule-text"><strong>Sin coaching no solicitado.</strong> Evita dar consejos no pedidos sobre cómo jugar, hablar o comportarse.</div>
     </div>
-    <div class="rule-item">
+    <div class="rule-item highlight">
       <div class="rule-num">6</div>
       <div class="rule-text"><strong>Sin comentarios románticos o sexuales.</strong> Ni en el muro general ni por privado a la streamer.
         <span class="sub">⚠️ Se considerará acoso y será sancionado.</span>
@@ -581,7 +689,7 @@ input[type=range].mp-vol::-webkit-slider-thumb{-webkit-appearance:none;width:10p
       <div class="rule-num">7</div>
       <div class="rule-text"><strong>Problemas personales, en privado.</strong> No traigan conflictos personales al servidor.</div>
     </div>
-    <div class="rule-item">
+    <div class="rule-item highlight">
       <div class="rule-num">8</div>
       <div class="rule-text"><strong>Respeto en el chat de voz.</strong> No entren a gritar ni a interrumpir continuamente a propósito. 🎙️</div>
     </div>
@@ -589,11 +697,11 @@ input[type=range].mp-vol::-webkit-slider-thumb{-webkit-appearance:none;width:10p
       <div class="rule-num">9</div>
       <div class="rule-text"><strong>Sin comentarios negativos.</strong> No hagan comentarios innecesarios o negativos hacia otras comunidades, juegos o personas.</div>
     </div>
-    <div class="rule-item">
+    <div class="rule-item highlight">
       <div class="rule-num">10</div>
       <div class="rule-text"><strong>Sin abuso de comandos ni menciones.</strong> Úsenlos con moderación y con propósito.</div>
     </div>
-    <div class="rule-item highlight">
+    <div class="rule-item">
       <div class="rule-num">11</div>
       <div class="rule-text"><strong>No entrar al chat de voz en estado de ebriedad.</strong>
         <span class="sub">🍹 JUGOSOS — quédense en casa y duerman</span>
@@ -609,11 +717,11 @@ input[type=range].mp-vol::-webkit-slider-thumb{-webkit-appearance:none;width:10p
         <span class="sub">⚠️ Tampoco se permite promover el suicidio.</span>
       </div>
     </div>
-    <div class="rule-item">
+    <div class="rule-item highlight">
       <div class="rule-num">14</div>
       <div class="rule-text"><strong>No transmitir cuando la Gow esté en directo en el canal.</strong> Respeta su espacio y momento. 📡</div>
     </div>
-    <div class="rule-item highlight">
+    <div class="rule-item">
       <div class="rule-num">15</div>
       <div class="rule-text"><strong>NO a la AUTOINVITACIÓN EN STREAM.</strong>
         <span class="sub">Siempre espera la invitación — nunca te autoinvites.</span>
@@ -661,8 +769,15 @@ input[type=range].mp-vol::-webkit-slider-thumb{-webkit-appearance:none;width:10p
   <span>Todos los artes pertenecen a sus respectivos artistas · Hecho con amor</span>
 </footer>
 
+<div id="idle-bubble">
+  <div class="ib-inner" id="idle-bubble-text">¡Oye! ¿Sigues ahí? 👀</div>
+  <div class="ib-arrow"></div>
+</div>
+
 <div id="music-player">
-  <div class="mp-wave" id="mp-wave"><span></span><span></span><span></span><span></span></div>
+  <div class="vinyl-wrap" onclick="togglePlay()" title="Play / Pausa">
+    <div class="vinyl" id="vinyl-disc"></div>
+  </div>
   <button class="mp-btn" onclick="prevSong()" title="Anterior">⏮</button>
   <button class="mp-btn big" id="mp-play" onclick="togglePlay()" title="Play / Pausa">▶</button>
   <button class="mp-btn" onclick="nextSong()" title="Siguiente">⏭</button>
@@ -681,6 +796,69 @@ input[type=range].mp-vol::-webkit-slider-thumb{-webkit-appearance:none;width:10p
 /* ============================
    ✏️ FECHA CUMPLEAÑOS — puedes cambiarla aquí
    ============================ */
+/* ============================
+   ✏️ LORE — editar aquí
+   ============================ */
+const LORE = {
+  quien: "LadyGowi es una vtuber de habla hispana, conocida por su personalidad tierna y sus cuernos de oveja. Su comunidad, los \"Gowitos\", la acompañan en cada stream con mucho cariño.",
+  metas: [
+    { ico:"🎯", txt:"Próximamente..." },
+    { ico:"✨", txt:"Próximamente..." },
+    { ico:"🐑", txt:"Próximamente..." },
+  ]
+};
+
+function renderLore(){
+  const quienEl=document.getElementById("lore-quien");
+  if(quienEl) quienEl.textContent=LORE.quien;
+  const metasEl=document.getElementById("lore-metas");
+  if(metasEl && LORE.metas.length){
+    metasEl.innerHTML=LORE.metas.map(m=>`<div class="meta-item"><div class="meta-ico">${m.ico}</div><div class="meta-txt">${m.txt}</div></div>`).join("");
+  }
+}
+
+/* ==== SALUDO SEGÚN HORA DEL DÍA — sale de la chibi (99) ==== */
+(function showGreeting(){
+  const h=new Date().getHours();
+  let main="", sub="";
+  if(h>=6&&h<12){  main="¡Buenos días, mi corderito! ☀️"; sub="Que tengas un día lleno de magia 💜"; }
+  else if(h>=12&&h<19){ main="¡Buenas tardes, mi corderito! 🌤️"; sub="Qué bueno tenerte por aquí 💜"; }
+  else if(h>=19&&h<24){ main="¡Buenas noches, mi corderito! 🌙"; sub="Gracias por pasarte a visitar 💜"; }
+  else{ main="¡Hola, mi corderito trasnochador! 🌌"; sub="Que descanses bien después 💜"; }
+  if(!main) return;
+  setTimeout(()=>{
+    const bubble=document.getElementById("chibi-bubble");
+    const chibiWrap=document.getElementById("chibi-wrap");
+    if(!bubble||!chibiWrap) return;
+    bubble.innerHTML=`<span style="font-weight:600">${main}</span><br><span style="font-size:11px;opacity:.8">${sub}</span>`;
+    bubble.classList.add("show");
+    clearTimeout(bubbleTimer);
+    bubbleTimer=setTimeout(()=>bubble.classList.remove("show"), 5000);
+  }, 900);
+})();
+
+/* ==== CHIBI IDLE — aparece si llevas 10 min sin interactuar (100) ==== */
+let _idleTimer=null;
+const IDLE_MSG=["¡Oye! ¿Sigues ahí? 👀","Psst… no te duermas 🐑","Sigo aquí esperándote 💜","¿Buscando algo en especial? ✨"];
+function resetIdleTimer(){
+  clearTimeout(_idleTimer);
+  const bubble=document.getElementById("idle-bubble");
+  if(bubble) bubble.classList.remove("show");
+  _idleTimer=setTimeout(()=>{
+    const chibiEl=document.getElementById("chibi-img");
+    const bubble=document.getElementById("idle-bubble");
+    if(!chibiEl||!bubble) return;
+    const rect=chibiEl.getBoundingClientRect();
+    bubble.style.top=(rect.top+window.scrollY-60)+"px";
+    bubble.style.left=(rect.left+rect.width/2-100)+"px";
+    document.getElementById("idle-bubble-text").textContent=IDLE_MSG[Math.floor(Math.random()*IDLE_MSG.length)];
+    bubble.classList.add("show");
+    setTimeout(()=>bubble.classList.remove("show"),5000);
+  }, 10*60*1000);
+}
+["click","mousemove","keydown","scroll","touchstart"].forEach(ev=>document.addEventListener(ev,resetIdleTimer,{passive:true}));
+resetIdleTimer();
+
 const BDAY_MONTH = 7;   // Julio = 7
 const BDAY_DAY   = 9;   // Día 9
 
@@ -792,44 +970,103 @@ const CHIBI_FRASES = [
 /* ==== INDICADOR "EN VIVO" DE TWITCH ====
    Cambia este nombre por el canal real de Twitch de LadyGowi: */
 /* ==== JUEGOS ====
-   nota: 1-5 (ovejas) | rec: "si" | "no" | "tal"
+   nota: 1-5 (ovejas) | rec: "si" | "no" | "tal" | imagen: ruta de la portada del juego
    La imagen de oveja rota entre las 4 de manera aleatoria por juego */
 const OVEJA_IMGS = [
-  "imagenes/ovejas/1782936821411-oveja4.png",
-  "imagenes/ovejas/1782936808659-oveja3.png",
-  "imagenes/ovejas/1782936796619-oveja2.png",
-  "imagenes/ovejas/1782936780290-oveja1.png",
+  "imagenes/ovejas/oveja1.png",
+  "imagenes/ovejas/oveja2.png",
+  "imagenes/ovejas/oveja3.png",
+  "imagenes/ovejas/oveja4.png",
 ];
 const JUEGOS = [
-  { titulo:"MInecraft", nota:5, rec:"si", nota_texto:"Es divertidisimo" },
   /* ejemplo — borra esta línea y agrega tus juegos:
   { titulo:"Nombre del juego", nota:4, rec:"si", nota_texto:"Muy divertido, lo recomiendo mucho 💜" },
   */
 ];
 const REC_LABEL = { si:"✅ Recomienda", no:"❌ No recomienda", tal:"🤔 Tal vez" };
 
+let currentGamesSearch="", gamesSort="default";
+function onGamesSearch(){
+  currentGamesSearch=document.getElementById("games-search").value.trim().toLowerCase();
+  renderGames();
+}
+function clearGamesSearch(){
+  document.getElementById("games-search").value="";
+  currentGamesSearch="";
+  document.getElementById("games-search-info").textContent="";
+  renderGames();
+}
+function toggleGamesSort(){
+  gamesSort = gamesSort==="default" ? "desc" : gamesSort==="desc" ? "asc" : "default";
+  const labels={"default":"🐑 Ordenar","desc":"🐑 Mayor nota","asc":"🐑 Menor nota"};
+  document.getElementById("gview-sort").textContent=labels[gamesSort];
+  document.getElementById("gview-sort").classList.toggle("active", gamesSort!=="default");
+  renderGames();
+}
+
+function switchGameView(view){
+  document.querySelectorAll(".games-view").forEach(v=>v.classList.remove("active"));
+  document.querySelectorAll(".view-btn").forEach(b=>b.classList.remove("active"));
+  document.getElementById("games-view-"+view).classList.add("active");
+  document.getElementById("gview-"+view).classList.add("active");
+}
+
 function renderGames(){
-  const grid = document.getElementById("games-grid");
-  if(!grid) return;
-  if(!JUEGOS.length){
-    grid.innerHTML='<div style="color:var(--text2);font-size:13px;text-align:center;padding:2rem;grid-column:1/-1">Próximamente los juegos que LadyGowi ha jugado 🎮</div>';
+  const list = document.getElementById("game-list");
+  const collage = document.getElementById("games-collage");
+  if(!list || !collage) return;
+
+  let games = [...JUEGOS];
+  if(currentGamesSearch) games=games.filter(j=>j.titulo.toLowerCase().includes(currentGamesSearch));
+  if(gamesSort==="desc") games.sort((a,b)=>(b.nota||0)-(a.nota||0));
+  if(gamesSort==="asc")  games.sort((a,b)=>(a.nota||0)-(b.nota||0));
+  const info=document.getElementById("games-search-info");
+  if(info) info.textContent = currentGamesSearch ? `${games.length} resultado${games.length!==1?"s":""} para "${currentGamesSearch}"` : "";
+
+  if(!games.length){
+    list.innerHTML=`<div style="color:var(--text2);font-size:13px;text-align:center;padding:2rem">${currentGamesSearch?"No se encontraron juegos con esa búsqueda 🔍":"Próximamente los juegos que LadyGowi ha jugado 🎮"}</div>`;
+    collage.innerHTML="";
     return;
   }
-  grid.innerHTML="";
-  JUEGOS.forEach((j,i)=>{
+
+  list.innerHTML="";
+  collage.innerHTML="";
+
+  games.forEach((j,i)=>{
     const ovejaIdx = i % OVEJA_IMGS.length;
     const ovejaImg = OVEJA_IMGS[ovejaIdx];
     const nota = Math.max(1,Math.min(5, j.nota||1));
     const ovejas = Array.from({length:nota}, ()=>`<img class="g-sheep" src="${ovejaImg}" alt="🐑"/>`).join("");
     const recClass = j.rec||"tal";
-    const card = document.createElement("div");
-    card.className="game-card";
-    card.innerHTML=`
-      <div class="g-title">${j.titulo}</div>
-      <div class="g-sheep-row">${ovejas}<span class="g-score-label">${nota}/5</span></div>
-      <div class="g-rec ${recClass}">${REC_LABEL[recClass]||""}</div>
-      ${j.nota_texto?`<div class="g-note">${j.nota_texto}</div>`:""}`;
-    grid.appendChild(card);
+    const coverSrc = j.imagen || "";
+
+    // — Lista —
+    const row = document.createElement("div");
+    row.className="game-row";
+    row.innerHTML=`
+      ${coverSrc
+        ? `<img class="g-cover" src="${coverSrc}" alt="${j.titulo}"/>`
+        : `<div class="g-cover-empty">🎮</div>`}
+      <div class="g-info">
+        <div class="g-title">${j.titulo}</div>
+        <div class="g-sheep-row">${ovejas}<span class="g-score-label">${nota}/5</span></div>
+        ${j.nota_texto?`<div class="g-desc">${j.nota_texto}</div>`:""}
+        <div class="g-rec ${recClass}">${REC_LABEL[recClass]||""}</div>
+      </div>`;
+    list.appendChild(row);
+
+    // — Collage —
+    const col = document.createElement("div");
+    if(coverSrc){
+      col.className="collage-item";
+      col.innerHTML=`
+        <img src="${coverSrc}" alt="${j.titulo}"/>
+        <div class="c-overlay"><div class="c-title">${j.titulo}</div></div>`;
+    } else {
+      col.className="collage-item-empty";
+      col.textContent="🎮";
+    }
+    collage.appendChild(col);
   });
 }
 
@@ -842,6 +1079,7 @@ function switchTab(tab){
   if(section) section.classList.add("active");
   if(btn) btn.classList.add("active");
   if(tab==="juegos") renderGames();
+  if(tab==="lore") renderLore();
   setTimeout(()=>window.dispatchEvent(new Event("resize")), 50);
 }
 
@@ -942,7 +1180,18 @@ function chibiClick() {
 }
 
 /* ==== GALERÍA ==== */
-let currentCat="all", currentSort="new";
+let currentCat="all", currentSort="new", currentSearch="";
+
+function onFanartSearch(){
+  currentSearch = document.getElementById("fanart-search").value.trim().toLowerCase();
+  renderGallery();
+}
+function clearFanartSearch(){
+  document.getElementById("fanart-search").value="";
+  currentSearch="";
+  document.getElementById("fanart-search-info").textContent="";
+  renderGallery();
+}
 let cardObserver = null;
 
 function setupObserver(){
@@ -957,7 +1206,13 @@ function renderGallery(){
   renderFeatured();
   let imgs=[...IMAGENES];
   if(currentCat!=="all") imgs=imgs.filter(i=>i.categoria===currentCat);
+  if(currentSearch) imgs=imgs.filter(i=>
+    i.titulo.toLowerCase().includes(currentSearch) ||
+    i.artista.toLowerCase().includes(currentSearch)
+  );
   imgs.sort((a,b)=>currentSort==="new"?new Date(b.fecha)-new Date(a.fecha):new Date(a.fecha)-new Date(b.fecha));
+  const info=document.getElementById("fanart-search-info");
+  if(info) info.textContent = currentSearch ? `${imgs.length} resultado${imgs.length!==1?"s":""} para "${currentSearch}"` : "";
   const masonry=document.getElementById("masonry"), empty=document.getElementById("empty");
   masonry.innerHTML="";
   setupObserver();
@@ -1151,7 +1406,8 @@ function initPlayer(autoplay){
 }
 function updateUI(){
   document.getElementById("mp-play").textContent=isPlaying?"⏸":"▶";
-  document.getElementById("mp-wave").classList.toggle("playing",isPlaying);
+  const vinyl=document.getElementById("vinyl-disc");
+  if(vinyl) vinyl.classList.toggle("spinning",isPlaying);
   document.querySelectorAll(".mp-dot").forEach((d,i)=>d.classList.toggle("active",i===currentIdx));
 }
 window.togglePlay=()=>{

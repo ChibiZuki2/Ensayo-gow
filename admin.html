@@ -247,8 +247,27 @@ body.locked .wrap{display:none}
   <!-- ===== LORE ===== -->
   <div class="admin-section" id="admintab-lore">
     <div class="panel">
-      <div class="panel-title">📖 Lore — próximamente</div>
-      <div class="manage-empty" style="padding:1rem 0">La edición del lore desde el panel está en desarrollo. Por ahora edítalo directamente en el código del index.html en la sección <code>tab-lore</code>.</div>
+      <div class="panel-title">📖 Lore — ¿Quién es LadyGowi?</div>
+      <div class="refresh-row"><button class="btn-secondary" onclick="loadLore()">↻ Cargar texto actual</button></div>
+      <div class="field">
+        <label>Descripción / Bio</label>
+        <textarea id="lore-quien-input" rows="5" placeholder="Describe a LadyGowi aquí..."></textarea>
+      </div>
+      <button class="btn-primary" onclick="saveLore()">Guardar bio</button>
+      <div id="lore-log" style="margin-top:.5rem"></div>
+    </div>
+    <div class="panel">
+      <div class="panel-title">💜 Metas</div>
+      <div id="lore-metas-list"><div class="manage-empty">Carga el lore primero.</div></div>
+      <div class="field" style="margin-top:1rem">
+        <label>Ícono (emoji)</label>
+        <input type="text" id="meta-ico" placeholder="🎯" style="width:80px"/>
+      </div>
+      <div class="field">
+        <label>Texto de la meta</label>
+        <input type="text" id="meta-txt" placeholder="Ej: Llegar a 1000 seguidores"/>
+      </div>
+      <button class="btn-primary" onclick="addMeta()">Agregar meta</button>
     </div>
   </div>
 
@@ -261,6 +280,11 @@ body.locked .wrap{display:none}
     <div class="field" style="margin-top:1rem">
       <label>Nombre del juego</label>
       <input type="text" id="game-titulo" placeholder="Ej: Minecraft"/>
+    </div>
+    <div class="field">
+      <label>Portada del juego (imagen)</label>
+      <input type="file" id="game-imagen" accept="image/*"/>
+      <div class="hint">Se sube a imagenes/juegos/ en tu repositorio. Recomendado: proporción 3:4 (portrait)</div>
     </div>
     <div class="row2">
       <div class="field">
@@ -385,6 +409,7 @@ function switchAdminTab(tab){
   if(section) section.classList.add("active");
   if(btn) btn.classList.add("active");
   if(tab==="fanarts"){ loadGalleryManage(); loadCategoriesFromRepo(); }
+  if(tab==="lore"){ loadLore(); }
   if(tab==="musica"){ loadMusicManage(); }
   if(tab==="chibi"){ loadSoundsManage(); loadPhrasesManage(); }
   if(tab==="juegos"){ loadGamesManage(); loadSheepIcons(); }
@@ -978,8 +1003,95 @@ async function addSheepIcon(){
   }catch(e){ alert("Error al subir: "+e.message); }
 }
 
+/* ==== GESTIONAR LORE ==== */
+const LORE_QUIEN_RE=/^const LORE = \{[\s\S]*?quien: "((?:\\.|[^"\\])*)",/m;
+const LORE_META_RE=/^\s*\{\s*ico:"((?:\\.|[^"\\])*)",\s*txt:"((?:\\.|[^"\\]*))"(?:\s*)\}/gm;
+
+async function loadLore(){
+  if(!cfg.token){ alert("Conecta tu token primero."); return; }
+  try{
+    const file=await getFile("index.html");
+    window._idxFile=file;
+    const content=base64ToUtf8(file.content);
+    window._idxLines=content.split("\n");
+
+    const quienMatch=content.match(/quien:\s*"((?:\\.|[^"\\])*)"/);
+    if(quienMatch) document.getElementById("lore-quien-input").value=unesc(quienMatch[1]);
+
+    const metas=[];
+    let m;
+    const metaRe=/\{\s*ico:"((?:\\.|[^"\\])*)",\s*txt:"((?:\\.|[^"\\]*))"(?:\s*)\}/g;
+    while((m=metaRe.exec(content))!==null) metas.push({ico:unesc(m[1]),txt:unesc(m[2]),raw:m[0],idx:m.index});
+    window._loreMetaItems=metas;
+    renderMetasList(metas);
+  }catch(e){ alert("Error: "+e.message); }
+}
+
+function renderMetasList(metas){
+  const box=document.getElementById("lore-metas-list");
+  if(!metas.length){ box.innerHTML='<div class="manage-empty">No hay metas aún.</div>'; return; }
+  box.innerHTML="";
+  metas.forEach((m,i)=>{
+    const div=document.createElement("div"); div.className="song-item";
+    div.innerHTML=`<div class="song-info"><div class="si-title">${m.ico} ${m.txt}</div></div>
+    <button class="icon-btn danger" onclick="deleteMeta(${i})">🗑</button>`;
+    box.appendChild(div);
+  });
+}
+
+async function saveLore(){
+  if(!cfg.token){ alert("Conecta tu token primero."); return; }
+  const quien=document.getElementById("lore-quien-input").value.trim();
+  if(!quien){ alert("Escribe algo en la bio."); return; }
+  try{
+    const file=await getFile("index.html");
+    const content=base64ToUtf8(file.content);
+    const newContent=content.replace(/quien:\s*"(?:\\.|[^"\\])*"/, `quien: "${esc(quien)}"`);
+    await putFile("index.html",utf8ToBase64(newContent),"Edita lore: bio",file.sha);
+    document.getElementById("lore-log").textContent="✓ Bio guardada.";
+    setTimeout(()=>document.getElementById("lore-log").textContent="",3000);
+  }catch(e){ alert("Error: "+e.message); }
+}
+
+async function deleteMeta(idx){
+  const meta=window._loreMetaItems[idx];
+  if(window._loreMetaItems.length<=1){ alert("Debe haber al menos una meta."); return; }
+  if(!confirm(`¿Eliminar la meta "${meta.txt}"?`)) return;
+  try{
+    const file=await getFile("index.html");
+    const content=base64ToUtf8(file.content);
+    const newContent=content.replace(/\s*\{\s*ico:"(?:\\.|[^"\\])*",\s*txt:"(?:\\.|[^"\\])*"(?:\s*)\},?/,
+      (match,offset)=> offset===meta.idx-content.slice(0,meta.idx).search(/\s*\{/)? "" : match);
+    // simpler: replace the raw meta entry
+    const escaped=meta.raw.replace(/[.*+?^${}()|[\]\\]/g,'\\$&');
+    const cleaned=content.replace(new RegExp(',?\\s*'+escaped),'');
+    await putFile("index.html",utf8ToBase64(cleaned),"Elimina meta de lore",file.sha);
+    await loadLore();
+  }catch(e){ alert("Error: "+e.message); }
+}
+
+async function addMeta(){
+  if(!cfg.token){ alert("Conecta tu token primero."); return; }
+  const ico=document.getElementById("meta-ico").value.trim()||"✨";
+  const txt=document.getElementById("meta-txt").value.trim();
+  if(!txt){ alert("Escribe el texto de la meta."); return; }
+  try{
+    const file=await getFile("index.html");
+    const content=base64ToUtf8(file.content);
+    const marker="  metas: [\n";
+    const idx=content.indexOf(marker);
+    if(idx===-1) throw new Error("No se encontró el array metas.");
+    const newLine=`    { ico:"${esc(ico)}", txt:"${esc(txt)}" },\n`;
+    const newContent=content.slice(0,idx+marker.length)+newLine+content.slice(idx+marker.length);
+    await putFile("index.html",utf8ToBase64(newContent),"Agrega meta de lore",file.sha);
+    document.getElementById("meta-ico").value="";
+    document.getElementById("meta-txt").value="";
+    await loadLore();
+  }catch(e){ alert("Error: "+e.message); }
+}
+
 /* ==== GESTIONAR JUEGOS ==== */
-const GAME_LINE_RE=/^(\s*)\{\s*titulo:"((?:\\.|[^"\\])*)",\s*nota:(\d+),\s*rec:"(si|no|tal)",\s*nota_texto:"((?:\\.|[^"\\])*)"\s*\},?\s*$/;
+const GAME_LINE_RE=/^(\s*)\{\s*titulo:"((?:\\.|[^"\\])*)",\s*nota:(\d+),\s*rec:"(si|no|tal)",\s*nota_texto:"((?:\\.|[^"\\])*)"(?:,\s*imagen:"((?:\\.|[^"\\])*)")?\s*\},?\s*$/;
 
 async function loadGamesManage(){
   const box=document.getElementById("games-list");
@@ -993,7 +1105,7 @@ async function loadGamesManage(){
     const games=[];
     window._idxLines.forEach((line,i)=>{
       const m=line.match(GAME_LINE_RE);
-      if(m) games.push({lineIndex:i,titulo:unesc(m[2]),nota:parseInt(m[3]),rec:m[4],nota_texto:unesc(m[5])});
+      if(m) games.push({lineIndex:i,titulo:unesc(m[2]),nota:parseInt(m[3]),rec:m[4],nota_texto:unesc(m[5]),imagen:m[6]||""});
     });
     window._gameItems=games;
     renderGamesList(games);
@@ -1008,9 +1120,12 @@ function renderGamesList(games){
   box.innerHTML="";
   games.forEach(g=>{
     const ovejas="🐑".repeat(g.nota);
+    const thumb = g.imagen ? `<img src="https://${cfg.owner}.github.io/${cfg.repo}/${g.imagen}" style="width:36px;height:46px;object-fit:cover;border-radius:6px;flex-shrink:0" onerror="this.style.display='none'"/>` : "";
     const div=document.createElement("div");
     div.className="song-item";
+    div.style.alignItems="center";
     div.innerHTML=`
+      ${thumb}
       <div class="song-info">
         <div class="si-title">${g.titulo} ${ovejas} (${g.nota}/5)</div>
         <div class="si-id">${REC_LABEL[g.rec]}${g.nota_texto?" · "+g.nota_texto:""}</div>
@@ -1036,20 +1151,35 @@ async function addGame(){
   const nota=parseInt(document.getElementById("game-nota").value);
   const rec=document.getElementById("game-rec").value;
   const nota_texto=document.getElementById("game-nota-texto").value.trim();
+  const imgInput=document.getElementById("game-imagen");
+  const imgFile=imgInput.files[0];
   if(!titulo){ alert("Escribe el nombre del juego."); return; }
   try{
+    let imagenPath="";
+    if(imgFile){
+      const base64=await new Promise((res,rej)=>{
+        const reader=new FileReader();
+        reader.onload=e=>res(e.target.result.split(",")[1]);
+        reader.onerror=rej;
+        reader.readAsDataURL(imgFile);
+      });
+      const cleanName=Date.now()+"-"+imgFile.name.toLowerCase().replace(/[^a-z0-9.\-]/g,"-").replace(/-+/g,"-");
+      imagenPath=`imagenes/juegos/${cleanName}`;
+      await putFile(imagenPath,base64,`Sube portada: ${titulo}`);
+    }
     const file=await getFile("index.html");
     const content=base64ToUtf8(file.content);
     const marker="const JUEGOS = [\n";
     const idx=content.indexOf(marker);
     if(idx===-1) throw new Error("No se encontró el array JUEGOS.");
-    const newLine=`  { titulo:"${esc(titulo)}", nota:${nota}, rec:"${rec}", nota_texto:"${esc(nota_texto)}" },\n`;
+    const newLine=`  { titulo:"${esc(titulo)}", nota:${nota}, rec:"${rec}", nota_texto:"${esc(nota_texto)}"${imagenPath?`, imagen:"${imagenPath}"`:"" } },\n`;
     const newContent=content.slice(0,idx+marker.length)+newLine+content.slice(idx+marker.length);
     await putFile("index.html",utf8ToBase64(newContent),`Agrega juego: ${titulo}`,file.sha);
     document.getElementById("game-titulo").value="";
     document.getElementById("game-nota-texto").value="";
     document.getElementById("game-nota").value="3";
     document.getElementById("game-rec").value="tal";
+    imgInput.value="";
     await loadGamesManage();
   }catch(e){ alert("Error al agregar: "+e.message); }
 }
