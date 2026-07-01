@@ -14,7 +14,65 @@
 body{background:var(--bg);color:var(--text);font-family:'Inter',sans-serif;transition:background .4s,color .4s;min-height:100vh;overflow-x:hidden}
 #star-canvas{position:fixed;inset:0;width:100%;height:100%;pointer-events:none;z-index:0}
 
-/* ===== TRANSICIÓN "SORPRÉNDEME" ===== */
+/* ===== NAVEGACIÓN POR PESTAÑAS (píldoras) ===== */
+.nav-tabs-wrap{position:relative;z-index:5;display:flex;justify-content:center;padding:.9rem 1rem .5rem;margin-top:-4px}
+.nav-tabs{display:flex;gap:6px;background:rgba(255,255,255,.06);border:.5px solid rgba(201,168,232,.15);padding:5px;border-radius:40px;backdrop-filter:blur(8px)}
+.nav-tab{padding:8px 22px;font-size:12.5px;font-family:'Inter',sans-serif;font-weight:500;letter-spacing:.06em;color:var(--text2);cursor:pointer;border-radius:30px;border:none;background:transparent;transition:background .22s,color .22s,transform .18s,box-shadow .22s;white-space:nowrap;position:relative;overflow:hidden}
+.nav-tab::before{content:'';position:absolute;inset:0;border-radius:30px;background:radial-gradient(circle at 50% 0%,rgba(201,168,232,.25),transparent 70%);opacity:0;transition:opacity .2s}
+.nav-tab:hover{color:var(--text);transform:translateY(-1px)}
+.nav-tab:hover::before{opacity:1}
+.nav-tab:active{transform:scale(.96)}
+.nav-tab.active{background:linear-gradient(135deg,rgba(168,85,247,.28),rgba(123,94,167,.2));color:var(--text);box-shadow:0 0 0 1px rgba(168,85,247,.45),0 4px 16px rgba(123,94,167,.25);text-shadow:0 0 12px rgba(201,168,232,.5)}
+.nav-tab.active::before{opacity:1}
+
+/* ===== SECCIONES ===== */
+.page-section{display:none;animation:sectionIn .35s ease both}
+.page-section.active{display:block}
+@keyframes sectionIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+
+/* ===== LORE ===== */
+.lore-wrap{max-width:720px;margin:0 auto;padding:2rem 1rem}
+.lore-card{background:var(--card);border:.5px solid var(--border-c);border-radius:18px;padding:1.8rem 2rem;margin-bottom:1.2rem}
+.lore-card h3{font-family:'Cinzel',serif;font-size:15px;color:var(--accent-light);letter-spacing:.1em;margin-bottom:1rem;display:flex;align-items:center;gap:8px}
+.lore-card p{font-size:13px;color:var(--text2);line-height:1.8}
+.metas-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:10px;margin-top:.8rem}
+.meta-item{background:var(--bg2);border:.5px solid var(--border-c);border-radius:12px;padding:12px 14px;display:flex;align-items:center;gap:10px}
+.meta-item .meta-ico{font-size:20px;flex-shrink:0}
+.meta-item .meta-txt{font-size:12px;color:var(--text2);line-height:1.5}
+
+/* ===== REGLAS ===== */
+.rules-wrap{max-width:720px;margin:0 auto;padding:2rem 1rem}
+.rule-item{display:flex;gap:14px;align-items:flex-start;background:var(--card);border:.5px solid var(--border-c);border-radius:14px;padding:1rem 1.2rem;margin-bottom:10px;transition:border-color .2s,transform .2s}
+.rule-item:hover{border-color:var(--accent);transform:translateX(4px)}
+.rule-item.highlight{border-color:rgba(168,85,247,.5);background:rgba(168,85,247,.08)}
+.rule-num{width:30px;height:30px;border-radius:50%;background:linear-gradient(135deg,var(--accent),var(--accent-light));color:#fff;font-size:12px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;box-shadow:0 0 10px rgba(168,85,247,.4)}
+.rule-text{font-size:13px;color:var(--text2);line-height:1.7}
+.rule-text strong{color:var(--text);font-weight:600}
+.rule-text .sub{display:block;font-size:11.5px;color:var(--accent-light);margin-top:3px;font-style:italic}
+.rules-footer{margin-top:1.6rem;background:rgba(168,85,247,.08);border:.5px solid rgba(168,85,247,.3);border-radius:14px;padding:1rem 1.2rem}
+.rules-footer .rf-pd{font-size:12px;color:var(--text2);margin-bottom:.5rem}
+.rules-footer .rf-note{font-size:11.5px;color:var(--accent-light);font-style:italic;line-height:1.6}
+.section-title{font-family:'Cinzel',serif;font-size:18px;color:var(--text);letter-spacing:.12em;text-align:center;margin-bottom:1.6rem;text-shadow:0 0 30px rgba(201,168,232,.3)}
+
+/* ===== JUEGOS ===== */
+.games-wrap{max-width:860px;margin:0 auto;padding:2rem 1rem}
+.games-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:14px}
+.game-card{background:var(--card);border:.5px solid var(--border-c);border-radius:16px;padding:1rem 1.1rem;transition:transform .2s,border-color .2s,box-shadow .2s;position:relative}
+.game-card:hover{transform:translateY(-4px);border-color:var(--accent);box-shadow:0 8px 24px rgba(123,94,167,.25)}
+.game-card .g-title{font-size:13.5px;font-weight:600;color:var(--text);margin-bottom:8px}
+.game-card .g-sheep-row{display:flex;gap:3px;align-items:center;margin-bottom:6px;flex-wrap:wrap}
+.game-card .g-sheep{width:28px;height:28px;object-fit:contain;animation:sheepBounce .4s ease both}
+.game-card .g-sheep:nth-child(2){animation-delay:.06s}
+.game-card .g-sheep:nth-child(3){animation-delay:.12s}
+.game-card .g-sheep:nth-child(4){animation-delay:.18s}
+.game-card .g-sheep:nth-child(5){animation-delay:.24s}
+@keyframes sheepBounce{from{opacity:0;transform:scale(.4) translateY(6px)}to{opacity:1;transform:scale(1) translateY(0)}}
+.game-card .g-score-label{font-size:10px;color:var(--text2);margin-left:4px;align-self:center}
+.game-card .g-rec{font-size:11px;margin-bottom:4px;font-weight:500}
+.game-card .g-note{font-size:11px;color:var(--text2);line-height:1.55}
+.g-rec.si{color:#7ecb9e}.g-rec.no{color:#e07c7c}.g-rec.tal{color:#c9a8e8}
+.games-legend{display:flex;gap:14px;justify-content:center;margin-bottom:1.4rem;font-size:11px;color:var(--text2);flex-wrap:wrap}
+.games-legend span{display:flex;align-items:center;gap:4px}
 #surprise-flash{position:fixed;inset:0;z-index:997;pointer-events:none;opacity:0;background:radial-gradient(circle,rgba(201,168,232,.55),rgba(123,94,167,.25) 45%,transparent 75%)}
 #surprise-flash.fire{animation:surpriseFlash .6s ease}
 @keyframes surpriseFlash{0%{opacity:0;transform:scale(.4)}35%{opacity:1;transform:scale(1.05)}100%{opacity:0;transform:scale(1.6)}}
@@ -407,32 +465,39 @@ input[type=range].mp-vol::-webkit-slider-thumb{-webkit-appearance:none;width:10p
     </div>
   </div>
   <div class="controls">
-    <div class="controls-left">
-      <span class="pal-label">Paleta:</span>
-      <div class="pal-btn active" data-t="dark"     title="Dark Demoness" onclick="setTheme(this,'dark')"></div>
-      <div class="pal-btn"        data-t="lavender" title="Lavender Dream" onclick="setTheme(this,'lavender')"></div>
-      <div class="pal-btn"        data-t="midnight" title="Midnight Goth"  onclick="setTheme(this,'midnight')"></div>
-    </div>
-    <div class="controls-right">
+    <div class="controls-left"></div>
+  </div>
+</div>
+
+<!-- ===== NAVEGACIÓN POR PESTAÑAS ===== -->
+<div class="nav-tabs-wrap">
+  <div class="nav-tabs">
+    <button class="nav-tab active" data-tab="fanarts" onclick="switchTab('fanarts')">🖼️ Fanarts</button>
+    <button class="nav-tab" data-tab="lore"    onclick="switchTab('lore')">📖 Lore</button>
+    <button class="nav-tab" data-tab="juegos"  onclick="switchTab('juegos')">🎮 Juegos</button>
+    <button class="nav-tab" data-tab="reglas"  onclick="switchTab('reglas')">📋 Reglas</button>
+  </div>
+</div>
+
+<!-- ===== SECCIÓN: FANARTS ===== -->
+<div class="page-section active" id="tab-fanarts">
+  <div class="featured-wrap" id="featured-wrap">
+    <div class="featured-title">✦ Destacados ✦</div>
+    <div class="featured-track" id="featured-track"></div>
+  </div>
+
+  <div class="filter-bar">
+    <span class="filter-label">FILTRAR:</span>
+    <span class="tag active" data-cat="all"    onclick="filterTag(this)">Todos</span>
+    <span class="tag"        data-cat="fanart" onclick="filterTag(this)">Fanart</span>
+    <span class="tag"        data-cat="emotes" onclick="filterTag(this)">Emotes</span>
+    <span class="tag"        data-cat="memes"  onclick="filterTag(this)">Memes</span>
+    <button class="surprise-btn" onclick="surpriseMe()">🎲 Sorpréndeme</button>
+    <div style="margin-left:auto;display:flex;gap:6px;">
       <button class="sort-btn active" id="sort-new" onclick="setSort('new')">🕐 Más nuevos</button>
       <button class="sort-btn"        id="sort-old" onclick="setSort('old')">🕐 Más antiguos</button>
     </div>
   </div>
-</div>
-
-<div class="featured-wrap" id="featured-wrap">
-  <div class="featured-title">✦ Destacados ✦</div>
-  <div class="featured-track" id="featured-track"></div>
-</div>
-
-<div class="filter-bar">
-  <span class="filter-label">FILTRAR:</span>
-  <span class="tag active" data-cat="all"    onclick="filterTag(this)">Todos</span>
-  <span class="tag"        data-cat="fanart" onclick="filterTag(this)">Fanart</span>
-  <span class="tag"        data-cat="emotes" onclick="filterTag(this)">Emotes</span>
-  <span class="tag"        data-cat="memes"  onclick="filterTag(this)">Memes</span>
-  <button class="surprise-btn" onclick="surpriseMe()">🎲 Sorpréndeme</button>
-</div>
 
 <div class="stats">
   <div><div class="stat-n" id="count">0</div><div class="stat-l">IMÁGENES</div></div>
@@ -444,6 +509,121 @@ input[type=range].mp-vol::-webkit-slider-thumb{-webkit-appearance:none;width:10p
   <div class="empty" id="empty">
     <div class="empty-icon">🐑</div>
     <div class="empty-text">No hay imágenes en esta categoría aún.</div>
+  </div>
+</div>
+</div><!-- fin tab-fanarts -->
+
+<!-- ===== SECCIÓN: LORE ===== -->
+<div class="page-section" id="tab-lore">
+  <div class="lore-wrap">
+    <div class="section-title">✦ Sobre LadyGowi ✦</div>
+    <div class="lore-card">
+      <h3>🐑 ¿Quién es LadyGowi?</h3>
+      <p>LadyGowi es una vtuber de habla hispana, conocida por su personalidad tierna y sus cuernos de oveja. Su comunidad, los "Gowitos", la acompañan en cada stream con mucho cariño. ¡Próximamente más lore aquí!</p>
+    </div>
+    <div class="lore-card">
+      <h3>💜 Metas</h3>
+      <div class="metas-grid">
+        <div class="meta-item"><div class="meta-ico">🎯</div><div class="meta-txt">Próximamente...</div></div>
+        <div class="meta-item"><div class="meta-ico">✨</div><div class="meta-txt">Próximamente...</div></div>
+        <div class="meta-item"><div class="meta-ico">🐑</div><div class="meta-txt">Próximamente...</div></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ===== SECCIÓN: JUEGOS ===== -->
+<div class="page-section" id="tab-juegos">
+  <div class="games-wrap">
+    <div class="section-title">✦ Juegos ✦</div>
+    <div class="games-legend">
+      <span>✅ Recomienda</span>
+      <span>❌ No recomienda</span>
+      <span>🤔 Tal vez</span>
+      <span style="opacity:.6">🐑 = 1/5 &nbsp; 🐑🐑🐑🐑🐑 = 5/5</span>
+    </div>
+    <div class="games-grid" id="games-grid"></div>
+  </div>
+</div>
+
+<!-- ===== SECCIÓN: REGLAS ===== -->
+<div class="page-section" id="tab-reglas">
+  <div class="rules-wrap">
+    <div class="section-title">✦ Reglas de la Secta ✦</div>
+
+    <div class="rule-item">
+      <div class="rule-num">1</div>
+      <div class="rule-text"><strong>Sin insultos ni toxicidad.</strong> La secta debe ser un lugar agradable donde pertenecer. Trátenla con amor 💜</div>
+    </div>
+    <div class="rule-item">
+      <div class="rule-num">2</div>
+      <div class="rule-text"><strong>Sin contenido dañino.</strong> No hagas posts promoviendo violencia, fraudes, gore o contenido +18 sin consentimiento de la Gow o Mods.</div>
+    </div>
+    <div class="rule-item">
+      <div class="rule-num">3</div>
+      <div class="rule-text"><strong>Sin spam ni publicidad.</strong> No publiques stream/discord/página u otros links que te beneficien de alguna forma.</div>
+    </div>
+    <div class="rule-item">
+      <div class="rule-num">4</div>
+      <div class="rule-text"><strong>No Spoilear.</strong> Si LadyGowi está jugando o viendo algo, guarda los spoilers para ti. 🤐</div>
+    </div>
+    <div class="rule-item">
+      <div class="rule-num">5</div>
+      <div class="rule-text"><strong>Sin coaching no solicitado.</strong> Evita dar consejos no pedidos sobre cómo jugar, hablar o comportarse.</div>
+    </div>
+    <div class="rule-item">
+      <div class="rule-num">6</div>
+      <div class="rule-text"><strong>Sin comentarios románticos o sexuales.</strong> Ni en el muro general ni por privado a la streamer.
+        <span class="sub">⚠️ Se considerará acoso y será sancionado.</span>
+      </div>
+    </div>
+    <div class="rule-item">
+      <div class="rule-num">7</div>
+      <div class="rule-text"><strong>Problemas personales, en privado.</strong> No traigan conflictos personales al servidor.</div>
+    </div>
+    <div class="rule-item">
+      <div class="rule-num">8</div>
+      <div class="rule-text"><strong>Respeto en el chat de voz.</strong> No entren a gritar ni a interrumpir continuamente a propósito. 🎙️</div>
+    </div>
+    <div class="rule-item">
+      <div class="rule-num">9</div>
+      <div class="rule-text"><strong>Sin comentarios negativos.</strong> No hagan comentarios innecesarios o negativos hacia otras comunidades, juegos o personas.</div>
+    </div>
+    <div class="rule-item">
+      <div class="rule-num">10</div>
+      <div class="rule-text"><strong>Sin abuso de comandos ni menciones.</strong> Úsenlos con moderación y con propósito.</div>
+    </div>
+    <div class="rule-item highlight">
+      <div class="rule-num">11</div>
+      <div class="rule-text"><strong>No entrar al chat de voz en estado de ebriedad.</strong>
+        <span class="sub">🍹 JUGOSOS — quédense en casa y duerman</span>
+      </div>
+    </div>
+    <div class="rule-item highlight">
+      <div class="rule-num">12</div>
+      <div class="rule-text"><strong>PROHIBIDO HABLAR DE HUEVITO REY*</strong> 🐣</div>
+    </div>
+    <div class="rule-item">
+      <div class="rule-num">13</div>
+      <div class="rule-text"><strong>Sin parafilias ni contenido que promueva el daño.</strong> (Zxxfilia, Pxdxfilia, Nxcrxfilia, etc.)
+        <span class="sub">⚠️ Tampoco se permite promover el suicidio.</span>
+      </div>
+    </div>
+    <div class="rule-item">
+      <div class="rule-num">14</div>
+      <div class="rule-text"><strong>No transmitir cuando la Gow esté en directo en el canal.</strong> Respeta su espacio y momento. 📡</div>
+    </div>
+    <div class="rule-item highlight">
+      <div class="rule-num">15</div>
+      <div class="rule-text"><strong>NO a la AUTOINVITACIÓN EN STREAM.</strong>
+        <span class="sub">Siempre espera la invitación — nunca te autoinvites.</span>
+      </div>
+    </div>
+
+    <div class="rules-footer">
+      <div class="rf-pd">📝 <strong>Pd:</strong> En caso de eco, mal sonido o mal funcionamiento de micrófono, se te muteará sin aviso previo.</div>
+      <div class="rf-note">Los mods pueden intervenir advirtiendo, borrando mensajes, aplicando warnings o timeouts. En caso de repetir malas actitudes, se aplicará la <strong>expulsión permanente.</strong></div>
+    </div>
   </div>
 </div>
 
@@ -501,8 +681,8 @@ input[type=range].mp-vol::-webkit-slider-thumb{-webkit-appearance:none;width:10p
 /* ============================
    ✏️ FECHA CUMPLEAÑOS — puedes cambiarla aquí
    ============================ */
-const BDAY_MONTH = 4;   // Abril = 4
-const BDAY_DAY   = 24;  // Día 24
+const BDAY_MONTH = 7;   // Julio = 7
+const BDAY_DAY   = 9;   // Día 9
 
 /* ============================
    ✏️ CANCIONES — editar aquí
@@ -516,20 +696,18 @@ const CANCIONES = [
    tipo: "chibi" (suena random al tocar la chibi) o "campana" (suena al tocar el título/campana)
    ============================ */
 const SONIDOS = [
-  { tipo:"chibi", nombre:"Ovejita seria", archivo:"sonidos/1782794020328-ovejita-seria.mp3", peso:1 },
-  { tipo:"chibi", nombre:"Oveja chillona", archivo:"sonidos/1782793989913-ovejita-chillona.mp3", peso:1 },
-  { tipo:"chibi", nombre:"Oveja chikita", archivo:"sonidos/1782793975181-ovejita-chikita.mp3", peso:1 },
-  { tipo:"campana", nombre:"Campanita 1", archivo:"sonidos/1782793928330-campanita1.mp3", peso:1 },
+  { tipo:"chibi",   nombre:"Oveja pequeña", archivo:"sonidos/small-sheep.mp3", peso:1 },
+  { tipo:"chibi",   nombre:"Oveja grande",  archivo:"sonidos/monsheep.mp3",    peso:1 },
+  { tipo:"campana", nombre:"Campanas",      archivo:"sonidos/sheep-bells.mp3", peso:1 },
 ];
 
 /* ============================
    ✏️ IMÁGENES — editar aquí
    ============================ */
 const IMAGENES = [
-      { src:"imagenes/1782848777527-1c67dd61-4a0f-4c1f-b117-6a99bb2b8172.png", titulo:"san gowi 2", artista:"coso", categoria:"fanart", fecha:"2026-06-30", placeholder:"🎨", nota:"nada", destacado:false },
-      { src:"imagenes/1782848628574-ae858789-ad9c-442d-96a4-5479403fcf2a.png", titulo:"San gowi", artista:"chibi", categoria:"fanart", fecha:"2026-06-30", placeholder:"🎨", nota:"San gowi uwu", destacado:false },
-      { src:"imagenes/1782848562601-ba7f692b-b4b5-429b-b839-efafa3052f1f-1-.png", titulo:"Secta con yepi", artista:"chibi", categoria:"fanart", fecha:"2026-06-30", placeholder:"🎨", nota:"Vitral junto a mi yepita", destacado:true },
-      { src:"imagenes/1782848498498-proyecto-gowi-1.png", titulo:"De mis primeros fanarts", artista:"chibi", categoria:"fanart", fecha:"2026-06-30", placeholder:"🎨", nota:"Fue uno de los primeros dibujos que me hicieron", destacado:true },
+  { src:"imagenes/ejemplo01.jpg", titulo:"Ejemplo fanart 1",  artista:"@artista",     categoria:"fanart", fecha:"2026-05-01", placeholder:"🎨", nota:"", destacado:false },
+  { src:"imagenes/ejemplo02.jpg", titulo:"Ejemplo emote",     artista:"@emoteartist", categoria:"emotes", fecha:"2026-05-10", placeholder:"✨", nota:"", destacado:false },
+  { src:"imagenes/ejemplo03.jpg", titulo:"Ejemplo meme",      artista:"@mememaster",  categoria:"memes",  fecha:"2026-05-20", placeholder:"😂", nota:"", destacado:false },
 ];
 
 /* ==== CUMPLEAÑOS / CUENTA REGRESIVA ==== */
@@ -613,6 +791,59 @@ const CHIBI_FRASES = [
 ];
 /* ==== INDICADOR "EN VIVO" DE TWITCH ====
    Cambia este nombre por el canal real de Twitch de LadyGowi: */
+/* ==== JUEGOS ====
+   nota: 1-5 (ovejas) | rec: "si" | "no" | "tal"
+   La imagen de oveja rota entre las 4 de manera aleatoria por juego */
+const OVEJA_IMGS = [
+  "imagenes/ovejas/oveja1.png",
+  "imagenes/ovejas/oveja2.png",
+  "imagenes/ovejas/oveja3.png",
+  "imagenes/ovejas/oveja4.png",
+];
+const JUEGOS = [
+  /* ejemplo — borra esta línea y agrega tus juegos:
+  { titulo:"Nombre del juego", nota:4, rec:"si", nota_texto:"Muy divertido, lo recomiendo mucho 💜" },
+  */
+];
+const REC_LABEL = { si:"✅ Recomienda", no:"❌ No recomienda", tal:"🤔 Tal vez" };
+
+function renderGames(){
+  const grid = document.getElementById("games-grid");
+  if(!grid) return;
+  if(!JUEGOS.length){
+    grid.innerHTML='<div style="color:var(--text2);font-size:13px;text-align:center;padding:2rem;grid-column:1/-1">Próximamente los juegos que LadyGowi ha jugado 🎮</div>';
+    return;
+  }
+  grid.innerHTML="";
+  JUEGOS.forEach((j,i)=>{
+    const ovejaIdx = i % OVEJA_IMGS.length;
+    const ovejaImg = OVEJA_IMGS[ovejaIdx];
+    const nota = Math.max(1,Math.min(5, j.nota||1));
+    const ovejas = Array.from({length:nota}, ()=>`<img class="g-sheep" src="${ovejaImg}" alt="🐑"/>`).join("");
+    const recClass = j.rec||"tal";
+    const card = document.createElement("div");
+    card.className="game-card";
+    card.innerHTML=`
+      <div class="g-title">${j.titulo}</div>
+      <div class="g-sheep-row">${ovejas}<span class="g-score-label">${nota}/5</span></div>
+      <div class="g-rec ${recClass}">${REC_LABEL[recClass]||""}</div>
+      ${j.nota_texto?`<div class="g-note">${j.nota_texto}</div>`:""}`;
+    grid.appendChild(card);
+  });
+}
+
+/* ==== NAVEGACIÓN POR PESTAÑAS ==== */
+function switchTab(tab){
+  document.querySelectorAll(".page-section").forEach(s=>s.classList.remove("active"));
+  document.querySelectorAll(".nav-tab").forEach(b=>b.classList.remove("active"));
+  const section = document.getElementById("tab-"+tab);
+  const btn = document.querySelector(`.nav-tab[data-tab="${tab}"]`);
+  if(section) section.classList.add("active");
+  if(btn) btn.classList.add("active");
+  if(tab==="juegos") renderGames();
+  setTimeout(()=>window.dispatchEvent(new Event("resize")), 50);
+}
+
 const TWITCH_CHANNEL = "ladygowi";
 
 async function checkTwitchLive(){
@@ -635,7 +866,7 @@ window.addEventListener("scroll", ()=>{
   fabs.forEach(f=>f.classList.toggle("show", show));
 }, {passive:true});
 
-const CHIBI_EGG = "✨ Shhh… sólo tú sabes esto: eres mi favorito favorito 🤫💜✨";
+const CHIBI_EGG = "✨ Shhh… sólo tú sabes esto: Eres mi persona favorita!! 🤫💜✨";
 
 (function scheduleChibiShake(){
   const next=()=>{

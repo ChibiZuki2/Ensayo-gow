@@ -16,6 +16,13 @@ h1 span{color:var(--accent-light)}
 .subtitle{text-align:center;font-size:12px;color:var(--text2);letter-spacing:.1em;margin-bottom:2rem}
 .panel{background:var(--card);border:.5px solid var(--border-c);border-radius:18px;padding:1.5rem;margin-bottom:1.2rem}
 .panel-title{font-size:13px;letter-spacing:.08em;color:var(--accent-light);margin-bottom:1rem;text-transform:uppercase;font-weight:500}
+
+/* ==== PESTAÑAS DEL ADMIN ==== */
+.admin-tabs{display:flex;gap:5px;background:rgba(255,255,255,.05);border:.5px solid var(--border-c);padding:5px;border-radius:14px;margin-bottom:1.4rem;flex-wrap:wrap}
+.admin-tab{padding:7px 14px;font-size:11.5px;letter-spacing:.05em;color:var(--text2);cursor:pointer;border-radius:10px;border:none;background:transparent;transition:all .2s;white-space:nowrap;font-family:'Inter',sans-serif}
+.admin-tab:hover{background:rgba(255,255,255,.07);color:var(--text)}
+.admin-tab.active{background:linear-gradient(135deg,rgba(168,85,247,.25),rgba(123,94,167,.18));color:var(--text);box-shadow:0 0 0 1px rgba(168,85,247,.4)}
+.admin-section{display:none}.admin-section.active{display:block}
 .field{margin-bottom:1rem}
 label{display:block;font-size:12px;color:var(--text2);margin-bottom:6px;letter-spacing:.03em}
 input[type=text],input[type=password],textarea,select{width:100%;background:var(--bg2);border:.5px solid var(--border-c);border-radius:10px;padding:10px 12px;color:var(--text);font-family:'Inter',sans-serif;font-size:14px;outline:none;transition:border-color .2s}
@@ -92,6 +99,12 @@ body.locked .wrap{display:none}
 .song-item .song-info .si-title{font-size:13px;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .song-item .song-info .si-id{font-size:11px;color:var(--text2)}
 .refresh-row{display:flex;justify-content:flex-end;margin-bottom:.8rem}
+.sheep-icons-grid{display:flex;flex-wrap:wrap;gap:10px;margin-bottom:.5rem}
+.sheep-icon-item{display:flex;flex-direction:column;align-items:center;gap:6px;background:var(--bg2);border:.5px solid var(--border-c);border-radius:12px;padding:10px;width:90px}
+.sheep-icon-item img{width:56px;height:56px;object-fit:contain}
+.sheep-icon-item .si-name{font-size:10px;color:var(--text2);text-align:center;word-break:break-all}
+.sheep-icon-item button{font-size:11px;padding:2px 8px;border-radius:8px;background:var(--tag-bg);border:.5px solid var(--tag-border);color:var(--err);cursor:pointer}
+.sheep-icon-item button:hover{background:var(--err);color:#fff}
 
 /* ==== LIVE PREVIEW CARD ==== */
 .live-preview-card{border:.5px solid var(--border-c);background:var(--bg2);border-radius:14px;overflow:hidden;max-width:230px}
@@ -119,6 +132,7 @@ body.locked .wrap{display:none}
   <div class="subtitle">PANEL PRIVADO DE PUBLICACIÓN</div>
   <a class="top-link" href="index.html">← Volver a la galería pública</a>
 
+  <!-- Config siempre visible -->
   <div class="panel" id="config-panel">
     <div class="panel-title">🔑 Conectar con GitHub</div>
     <div class="field">
@@ -142,8 +156,20 @@ body.locked .wrap{display:none}
     </div>
   </div>
 
-  <div class="panel" id="publish-panel">
-    <div class="panel-title">🎨 Subir un nuevo fanart</div>
+  <!-- Pestañas de navegación -->
+  <div class="admin-tabs">
+    <button class="admin-tab active" data-tab="fanarts" onclick="switchAdminTab('fanarts')">🖼️ Fanarts</button>
+    <button class="admin-tab" data-tab="lore"    onclick="switchAdminTab('lore')">📖 Lore</button>
+    <button class="admin-tab" data-tab="juegos"  onclick="switchAdminTab('juegos')">🎮 Juegos</button>
+    <button class="admin-tab" data-tab="reglas"  onclick="switchAdminTab('reglas')">📋 Reglas</button>
+    <button class="admin-tab" data-tab="musica"  onclick="switchAdminTab('musica')">🎵 Música</button>
+    <button class="admin-tab" data-tab="chibi"   onclick="switchAdminTab('chibi')">🐑 Chibi</button>
+  </div>
+
+  <!-- ===== FANARTS ===== -->
+  <div class="admin-section active" id="admintab-fanarts">
+    <div class="panel" id="publish-panel">
+      <div class="panel-title">🎨 Subir un nuevo fanart</div>
     <div class="dropzone" id="dropzone" onclick="document.getElementById('file-input').click()">
       <input type="file" id="file-input" accept="image/*" onchange="handleFile(this.files[0])"/>
       <div id="dropzone-empty">
@@ -193,10 +219,9 @@ body.locked .wrap{display:none}
         </div>
       </div>
     </div>
-  </div>
-
-  <div class="panel" id="manage-panel">
-    <div class="panel-title">📂 Imágenes publicadas</div>
+    </div>
+    <div class="panel" id="manage-panel">
+      <div class="panel-title">📂 Imágenes publicadas</div>
     <div class="refresh-row"><button class="btn-secondary" onclick="loadGalleryManage()">↻ Actualizar lista</button></div>
     <div class="row2" style="margin-bottom:1rem;">
       <div class="field" style="margin:0;">
@@ -207,20 +232,88 @@ body.locked .wrap{display:none}
       </div>
     </div>
     <div id="manage-list"><div class="manage-empty">Conecta tu token y pulsa "Actualizar lista" para ver las imágenes.</div></div>
-  </div>
-
-  <div class="panel" id="cat-panel">
-    <div class="panel-title">🏷️ Categorías</div>
+    </div>
+    <div class="panel" id="cat-panel">
+      <div class="panel-title">🏷️ Categorías</div>
     <div class="category-manage" id="cat-chips"></div>
     <div class="add-cat-row">
       <input type="text" id="new-cat-input" placeholder="Nombre de categoría nueva, ej: wallpapers"/>
       <button class="btn-secondary" onclick="addCategory()">Agregar</button>
     </div>
     <div class="hint" style="margin-top:10px;">Las categorías que borres aquí no eliminan imágenes ya publicadas, pero esas imágenes dejarán de tener un botón de filtro visible hasta que la categoría exista de nuevo.</div>
+    </div>
   </div>
 
-  <div class="panel" id="music-panel">
-    <div class="panel-title">🎵 Música de la página</div>
+  <!-- ===== LORE ===== -->
+  <div class="admin-section" id="admintab-lore">
+    <div class="panel">
+      <div class="panel-title">📖 Lore — próximamente</div>
+      <div class="manage-empty" style="padding:1rem 0">La edición del lore desde el panel está en desarrollo. Por ahora edítalo directamente en el código del index.html en la sección <code>tab-lore</code>.</div>
+    </div>
+  </div>
+
+  <!-- ===== JUEGOS ===== -->
+  <div class="admin-section" id="admintab-juegos">
+    <div class="panel" id="games-panel">
+      <div class="panel-title">🎮 Juegos</div>
+    <div class="refresh-row"><button class="btn-secondary" onclick="loadGamesManage()">↻ Actualizar lista</button></div>
+    <div id="games-list"><div class="manage-empty">Conecta tu token y pulsa "Actualizar lista".</div></div>
+    <div class="field" style="margin-top:1rem">
+      <label>Nombre del juego</label>
+      <input type="text" id="game-titulo" placeholder="Ej: Minecraft"/>
+    </div>
+    <div class="row2">
+      <div class="field">
+        <label>Nota (1 a 5 ovejas 🐑)</label>
+        <select id="game-nota">
+          <option value="1">🐑 (1/5)</option>
+          <option value="2">🐑🐑 (2/5)</option>
+          <option value="3" selected>🐑🐑🐑 (3/5)</option>
+          <option value="4">🐑🐑🐑🐑 (4/5)</option>
+          <option value="5">🐑🐑🐑🐑🐑 (5/5)</option>
+        </select>
+      </div>
+      <div class="field">
+        <label>¿Lo recomienda?</label>
+        <select id="game-rec">
+          <option value="si">✅ Sí recomienda</option>
+          <option value="tal" selected>🤔 Tal vez</option>
+          <option value="no">❌ No recomienda</option>
+        </select>
+      </div>
+    </div>
+    <div class="field">
+      <label>Comentario (opcional)</label>
+      <textarea id="game-nota-texto" placeholder="Ej: Muy divertido, lo pasamos genial en stream 💜"></textarea>
+    </div>
+    <button class="btn-primary" onclick="addGame()">Agregar juego</button>
+
+    <div style="border-top:.5px solid var(--border-c);margin-top:1.6rem;padding-top:1.2rem">
+      <div class="panel-title" style="font-size:13px;margin-bottom:.8rem">🐑 Iconos de oveja (para las calificaciones)</div>
+      <div class="refresh-row"><button class="btn-secondary" onclick="loadSheepIcons()">↻ Ver iconos actuales</button></div>
+      <div id="sheep-icons-list"><div class="manage-empty">Pulsa "Ver iconos actuales" para verlos.</div></div>
+      <div class="field" style="margin-top:1rem">
+        <label>Agregar nuevo icono de oveja</label>
+        <input type="file" id="sheep-icon-file" accept="image/png,image/gif,image/webp"/>
+        <div class="hint">PNG con fondo transparente recomendado. Se guardará en imagenes/ovejas/</div>
+      </div>
+      <button class="btn-primary" onclick="addSheepIcon()">Agregar icono</button>
+    </div>
+    </div>
+  </div>
+
+  <!-- ===== REGLAS ===== -->
+  <div class="admin-section" id="admintab-reglas">
+    <div class="panel">
+      <div class="panel-title">📋 Reglas — próximamente</div>
+      <div class="manage-empty" style="padding:1rem 0">La edición de reglas desde el panel está en desarrollo. Por ahora edítalas directamente en el código del index.html en la sección <code>tab-reglas</code>.</div>
+    </div>
+  </div>
+
+  <!-- ===== MÚSICA ===== -->
+  <div class="admin-section" id="admintab-musica">
+    <div class="panel" id="music-panel">
+      <div class="panel-title">🎵 Música de la página</div>
     <div class="refresh-row"><button class="btn-secondary" onclick="loadMusicManage()">↻ Actualizar lista</button></div>
     <div id="music-list"><div class="manage-empty">Conecta tu token y pulsa "Actualizar lista" para ver las canciones.</div></div>
     <div class="field" style="margin-top:1rem;">
@@ -233,10 +326,13 @@ body.locked .wrap{display:none}
       <div class="hint">Pega el link completo del video, la app saca el ID sola.</div>
     </div>
     <button class="btn-primary" onclick="addSong()">Agregar canción</button>
+    </div>
   </div>
 
-  <div class="panel" id="sounds-panel">
-    <div class="panel-title">🐑 Sonidos (chibi y campana)</div>
+  <!-- ===== CHIBI ===== -->
+  <div class="admin-section" id="admintab-chibi">
+    <div class="panel" id="sounds-panel">
+      <div class="panel-title">🐑 Sonidos (chibi y campana)</div>
     <div class="refresh-row"><button class="btn-secondary" onclick="loadSoundsManage()">↻ Actualizar lista</button></div>
     <div id="sounds-list"><div class="manage-empty">Conecta tu token y pulsa "Actualizar lista" para ver los sonidos.</div></div>
     <div class="field" style="margin-top:1rem;">
@@ -261,10 +357,9 @@ body.locked .wrap{display:none}
       <div class="hint">1 = normal. Un sonido con peso 3 sonará 3 veces más seguido que uno con peso 1.</div>
     </div>
     <button class="btn-primary" onclick="addSound()">Agregar sonido</button>
-  </div>
-
-  <div class="panel" id="phrases-panel">
-    <div class="panel-title">💬 Frases de la chibi</div>
+    </div>
+    <div class="panel" id="phrases-panel">
+      <div class="panel-title">💬 Frases de la chibi</div>
     <div class="refresh-row"><button class="btn-secondary" onclick="loadPhrasesManage()">↻ Actualizar lista</button></div>
     <div id="phrases-list"><div class="manage-empty">Conecta tu token y pulsa "Actualizar lista" para ver las frases.</div></div>
     <div class="field" style="margin-top:1rem;">
@@ -277,10 +372,24 @@ body.locked .wrap{display:none}
       <div class="hint">1 = normal. Una frase con peso 3 saldrá 3 veces más seguido que una con peso 1.</div>
     </div>
     <button class="btn-primary" onclick="addPhrase()">Agregar frase</button>
+    </div>
   </div>
 </div>
-
 <script>
+/* ==== PESTAÑAS DEL ADMIN ==== */
+function switchAdminTab(tab){
+  document.querySelectorAll(".admin-section").forEach(s=>s.classList.remove("active"));
+  document.querySelectorAll(".admin-tab").forEach(b=>b.classList.remove("active"));
+  const section=document.getElementById("admintab-"+tab);
+  const btn=document.querySelector(`.admin-tab[data-tab="${tab}"]`);
+  if(section) section.classList.add("active");
+  if(btn) btn.classList.add("active");
+  if(tab==="fanarts"){ loadGalleryManage(); loadCategoriesFromRepo(); }
+  if(tab==="musica"){ loadMusicManage(); }
+  if(tab==="chibi"){ loadSoundsManage(); loadPhrasesManage(); }
+  if(tab==="juegos"){ loadGamesManage(); loadSheepIcons(); }
+}
+
 /* ==== LOCK SCREEN (capa simple, no es seguridad real — ver nota) ==== */
 const LOCK_KEY="ladygowi_admin_lock";
 async function sha256(text){
@@ -788,6 +897,163 @@ async function addPhrase(){
   }catch(e){ alert("Error al agregar: "+e.message); }
 }
 
+/* ==== GESTIONAR ICONOS DE OVEJA ==== */
+const OVEJA_LINE_RE=/^(\s*)"(imagenes\/ovejas\/[^"]+)",?\s*$/;
+
+async function loadSheepIcons(){
+  const box=document.getElementById("sheep-icons-list");
+  if(!cfg.token){ box.innerHTML='<div class="manage-empty" style="color:var(--err)">Conecta tu token primero.</div>'; return; }
+  box.innerHTML='<div class="manage-empty">Cargando...</div>';
+  try{
+    const file=await getFile("index.html");
+    window._idxFile=file;
+    const content=base64ToUtf8(file.content);
+    window._idxLines=content.split("\n");
+    const icons=[];
+    window._idxLines.forEach((line,i)=>{
+      const m=line.match(OVEJA_LINE_RE);
+      if(m) icons.push({lineIndex:i, path:m[2]});
+    });
+    window._sheepIconItems=icons;
+    renderSheepIcons(icons);
+  }catch(e){ box.innerHTML=`<div class="manage-empty" style="color:var(--err)">Error: ${e.message}</div>`; }
+}
+
+function renderSheepIcons(icons){
+  const box=document.getElementById("sheep-icons-list");
+  if(!icons.length){ box.innerHTML='<div class="manage-empty">No hay iconos aún.</div>'; return; }
+  const grid=document.createElement("div"); grid.className="sheep-icons-grid";
+  icons.forEach(ic=>{
+    const name=ic.path.split("/").pop();
+    const url=`https://${cfg.owner}.github.io/${cfg.repo}/${ic.path}`;
+    const item=document.createElement("div"); item.className="sheep-icon-item";
+    item.innerHTML=`
+      <img src="${url}" onerror="this.style.opacity='.3'" alt="${name}"/>
+      <div class="si-name">${name}</div>
+      <button onclick="deleteSheepIcon(${ic.lineIndex})">🗑 Quitar</button>`;
+    grid.appendChild(item);
+  });
+  box.innerHTML="";
+  box.appendChild(grid);
+  if(icons.length<=1) box.insertAdjacentHTML("beforeend",'<div class="hint">Debe quedar al menos un icono.</div>');
+}
+
+async function deleteSheepIcon(lineIndex){
+  const icon=window._sheepIconItems.find(x=>x.lineIndex===lineIndex);
+  if(window._sheepIconItems.length<=1){ alert("Debe quedar al menos un icono de oveja."); return; }
+  if(!confirm(`¿Quitar el icono "${icon.path.split("/").pop()}" de la lista?`)) return;
+  try{
+    const lines=window._idxLines.slice(); lines.splice(lineIndex,1);
+    await putFile("index.html",utf8ToBase64(lines.join("\n")),`Quita icono oveja: ${icon.path}`,window._idxFile.sha);
+    await loadSheepIcons();
+  }catch(e){ alert("Error: "+e.message); }
+}
+
+async function addSheepIcon(){
+  if(!cfg.token){ alert("Conecta tu token primero."); return; }
+  const fileInput=document.getElementById("sheep-icon-file");
+  const file=fileInput.files[0];
+  if(!file){ alert("Selecciona una imagen primero."); return; }
+  try{
+    const base64=await new Promise((res,rej)=>{
+      const reader=new FileReader();
+      reader.onload=e=>res(e.target.result.split(",")[1]);
+      reader.onerror=rej;
+      reader.readAsDataURL(file);
+    });
+    const cleanName=Date.now()+"-"+file.name.toLowerCase().replace(/[^a-z0-9.\-]/g,"-").replace(/-+/g,"-");
+    const iconPath=`imagenes/ovejas/${cleanName}`;
+    await putFile(iconPath,base64,`Sube icono oveja: ${cleanName}`);
+
+    const idxFile=await getFile("index.html");
+    const content=base64ToUtf8(idxFile.content);
+    const marker='const OVEJA_IMGS = [\n';
+    const idx=content.indexOf(marker);
+    if(idx===-1) throw new Error("No se encontró el array OVEJA_IMGS.");
+    const newLine=`  "${iconPath}",\n`;
+    const newContent=content.slice(0,idx+marker.length)+newLine+content.slice(idx+marker.length);
+    await putFile("index.html",utf8ToBase64(newContent),`Agrega icono oveja: ${cleanName}`,idxFile.sha);
+    fileInput.value="";
+    await loadSheepIcons();
+  }catch(e){ alert("Error al subir: "+e.message); }
+}
+
+/* ==== GESTIONAR JUEGOS ==== */
+const GAME_LINE_RE=/^(\s*)\{\s*titulo:"((?:\\.|[^"\\])*)",\s*nota:(\d+),\s*rec:"(si|no|tal)",\s*nota_texto:"((?:\\.|[^"\\])*)"\s*\},?\s*$/;
+
+async function loadGamesManage(){
+  const box=document.getElementById("games-list");
+  if(!cfg.token){ box.innerHTML='<div class="manage-empty" style="color:var(--err)">Conecta tu token primero.</div>'; return; }
+  box.innerHTML='<div class="manage-empty">Cargando...</div>';
+  try{
+    const file=await getFile("index.html");
+    window._idxFile=file;
+    const content=base64ToUtf8(file.content);
+    window._idxLines=content.split("\n");
+    const games=[];
+    window._idxLines.forEach((line,i)=>{
+      const m=line.match(GAME_LINE_RE);
+      if(m) games.push({lineIndex:i,titulo:unesc(m[2]),nota:parseInt(m[3]),rec:m[4],nota_texto:unesc(m[5])});
+    });
+    window._gameItems=games;
+    renderGamesList(games);
+  }catch(e){ box.innerHTML=`<div class="manage-empty" style="color:var(--err)">Error: ${e.message}</div>`; }
+}
+
+const REC_LABEL={ si:"✅ Recomienda", no:"❌ No recomienda", tal:"🤔 Tal vez" };
+
+function renderGamesList(games){
+  const box=document.getElementById("games-list");
+  if(!games.length){ box.innerHTML='<div class="manage-empty">No hay juegos aún.</div>'; return; }
+  box.innerHTML="";
+  games.forEach(g=>{
+    const ovejas="🐑".repeat(g.nota);
+    const div=document.createElement("div");
+    div.className="song-item";
+    div.innerHTML=`
+      <div class="song-info">
+        <div class="si-title">${g.titulo} ${ovejas} (${g.nota}/5)</div>
+        <div class="si-id">${REC_LABEL[g.rec]}${g.nota_texto?" · "+g.nota_texto:""}</div>
+      </div>
+      <button class="icon-btn danger" title="Eliminar" onclick="deleteGame(${g.lineIndex})">🗑</button>`;
+    box.appendChild(div);
+  });
+}
+
+async function deleteGame(lineIndex){
+  const game=window._gameItems.find(x=>x.lineIndex===lineIndex);
+  if(!confirm(`¿Eliminar el juego "${game.titulo}"?`)) return;
+  try{
+    const lines=window._idxLines.slice(); lines.splice(lineIndex,1);
+    await putFile("index.html",utf8ToBase64(lines.join("\n")),`Elimina juego: ${game.titulo}`,window._idxFile.sha);
+    await loadGamesManage();
+  }catch(e){ alert("Error al eliminar: "+e.message); }
+}
+
+async function addGame(){
+  if(!cfg.token){ alert("Conecta tu token primero."); return; }
+  const titulo=document.getElementById("game-titulo").value.trim();
+  const nota=parseInt(document.getElementById("game-nota").value);
+  const rec=document.getElementById("game-rec").value;
+  const nota_texto=document.getElementById("game-nota-texto").value.trim();
+  if(!titulo){ alert("Escribe el nombre del juego."); return; }
+  try{
+    const file=await getFile("index.html");
+    const content=base64ToUtf8(file.content);
+    const marker="const JUEGOS = [\n";
+    const idx=content.indexOf(marker);
+    if(idx===-1) throw new Error("No se encontró el array JUEGOS.");
+    const newLine=`  { titulo:"${esc(titulo)}", nota:${nota}, rec:"${rec}", nota_texto:"${esc(nota_texto)}" },\n`;
+    const newContent=content.slice(0,idx+marker.length)+newLine+content.slice(idx+marker.length);
+    await putFile("index.html",utf8ToBase64(newContent),`Agrega juego: ${titulo}`,file.sha);
+    document.getElementById("game-titulo").value="";
+    document.getElementById("game-nota-texto").value="";
+    document.getElementById("game-nota").value="3";
+    document.getElementById("game-rec").value="tal";
+    await loadGamesManage();
+  }catch(e){ alert("Error al agregar: "+e.message); }
+}
+
 /* ==== LOG ==== */
 function logLine(text,type="info"){
   const log=document.getElementById("log"); log.classList.add("show");
@@ -862,7 +1128,7 @@ async function publish(){
   finally{ btn.disabled=false; btn.textContent="Publicar en la galería"; }
 }
 
-if(cfg.token){ loadCategoriesFromRepo(); loadGalleryManage(); loadMusicManage(); loadSoundsManage(); loadPhrasesManage(); }
+if(cfg.token){ loadCategoriesFromRepo(); loadGalleryManage(); loadMusicManage(); loadSoundsManage(); loadPhrasesManage(); loadGamesManage(); }
 </script>
 </body>
 </html>
