@@ -792,197 +792,10 @@ input[type=range].mp-vol::-webkit-slider-thumb{-webkit-appearance:none;width:10p
 </div>
 <button id="music-fab" onclick="showPlayer()" title="Abrir reproductor">🎵</button>
 
+<script src="data.js"></script>
 <script>
-/* ============================
-   ✏️ FECHA CUMPLEAÑOS — puedes cambiarla aquí
+/* ==== CUMPLEAÑOS / CUENTA REGRESIVA ==== */ — puedes cambiarla aquí
    ============================ */
-/* ============================
-   ✏️ LORE — editar aquí
-   ============================ */
-const LORE = {
-  quien: "LadyGowi es una vtuber de habla hispana, conocida por su personalidad tierna y sus cuernos de oveja. Su comunidad, los \"Gowitos\", la acompañan en cada stream con mucho cariño.",
-  metas: [
-    { ico:"🎯", txt:"Próximamente..." },
-    { ico:"✨", txt:"Próximamente..." },
-    { ico:"🐑", txt:"Próximamente..." },
-  ]
-};
-
-function renderLore(){
-  const quienEl=document.getElementById("lore-quien");
-  if(quienEl) quienEl.textContent=LORE.quien;
-  const metasEl=document.getElementById("lore-metas");
-  if(metasEl && LORE.metas.length){
-    metasEl.innerHTML=LORE.metas.map(m=>`<div class="meta-item"><div class="meta-ico">${m.ico}</div><div class="meta-txt">${m.txt}</div></div>`).join("");
-  }
-}
-
-/* ==== SALUDO SEGÚN HORA DEL DÍA — sale de la chibi (99) ==== */
-(function showGreeting(){
-  const h=new Date().getHours();
-  let main="", sub="";
-  if(h>=6&&h<12){  main="¡Buenos días, mi corderito! ☀️"; sub="Que tengas un día lleno de magia 💜"; }
-  else if(h>=12&&h<19){ main="¡Buenas tardes, mi corderito! 🌤️"; sub="Qué bueno tenerte por aquí 💜"; }
-  else if(h>=19&&h<24){ main="¡Buenas noches, mi corderito! 🌙"; sub="Gracias por pasarte a visitar 💜"; }
-  else{ main="¡Hola, mi corderito trasnochador! 🌌"; sub="Que descanses bien después 💜"; }
-  if(!main) return;
-  setTimeout(()=>{
-    const bubble=document.getElementById("chibi-bubble");
-    const chibiWrap=document.getElementById("chibi-wrap");
-    if(!bubble||!chibiWrap) return;
-    bubble.innerHTML=`<span style="font-weight:600">${main}</span><br><span style="font-size:11px;opacity:.8">${sub}</span>`;
-    bubble.classList.add("show");
-    clearTimeout(bubbleTimer);
-    bubbleTimer=setTimeout(()=>bubble.classList.remove("show"), 5000);
-  }, 900);
-})();
-
-/* ==== CHIBI IDLE — aparece si llevas 10 min sin interactuar (100) ==== */
-let _idleTimer=null;
-const IDLE_MSG=["¡Oye! ¿Sigues ahí? 👀","Psst… no te duermas 🐑","Sigo aquí esperándote 💜","¿Buscando algo en especial? ✨"];
-function resetIdleTimer(){
-  clearTimeout(_idleTimer);
-  const bubble=document.getElementById("idle-bubble");
-  if(bubble) bubble.classList.remove("show");
-  _idleTimer=setTimeout(()=>{
-    const chibiEl=document.getElementById("chibi-img");
-    const bubble=document.getElementById("idle-bubble");
-    if(!chibiEl||!bubble) return;
-    const rect=chibiEl.getBoundingClientRect();
-    bubble.style.top=(rect.top+window.scrollY-60)+"px";
-    bubble.style.left=(rect.left+rect.width/2-100)+"px";
-    document.getElementById("idle-bubble-text").textContent=IDLE_MSG[Math.floor(Math.random()*IDLE_MSG.length)];
-    bubble.classList.add("show");
-    setTimeout(()=>bubble.classList.remove("show"),5000);
-  }, 10*60*1000);
-}
-["click","mousemove","keydown","scroll","touchstart"].forEach(ev=>document.addEventListener(ev,resetIdleTimer,{passive:true}));
-resetIdleTimer();
-
-const BDAY_MONTH = 7;   // Julio = 7
-const BDAY_DAY   = 9;   // Día 9
-
-/* ============================
-   ✏️ CANCIONES — editar aquí
-   ============================ */
-const CANCIONES = [
-  { titulo:"LadyGowi — música 1", youtubeId:"QLHMhVonF-s" },
-];
-
-/* ============================
-   ✏️ SONIDOS — editar aquí
-   tipo: "chibi" (suena random al tocar la chibi) o "campana" (suena al tocar el título/campana)
-   ============================ */
-const SONIDOS = [
-  { tipo:"chibi",   nombre:"Oveja pequeña", archivo:"sonidos/small-sheep.mp3", peso:1 },
-  { tipo:"chibi",   nombre:"Oveja grande",  archivo:"sonidos/monsheep.mp3",    peso:1 },
-  { tipo:"campana", nombre:"Campanas",      archivo:"sonidos/sheep-bells.mp3", peso:1 },
-];
-
-/* ============================
-   ✏️ IMÁGENES — editar aquí
-   ============================ */
-const IMAGENES = [
-  { src:"imagenes/ejemplo01.jpg", titulo:"Ejemplo fanart 1",  artista:"@artista",     categoria:"fanart", fecha:"2026-05-01", placeholder:"🎨", nota:"", destacado:false },
-  { src:"imagenes/ejemplo02.jpg", titulo:"Ejemplo emote",     artista:"@emoteartist", categoria:"emotes", fecha:"2026-05-10", placeholder:"✨", nota:"", destacado:false },
-  { src:"imagenes/ejemplo03.jpg", titulo:"Ejemplo meme",      artista:"@mememaster",  categoria:"memes",  fecha:"2026-05-20", placeholder:"😂", nota:"", destacado:false },
-];
-
-/* ==== CUMPLEAÑOS / CUENTA REGRESIVA ==== */
-(function(){
-  const now   = new Date();
-  const year  = now.getFullYear();
-  let bday    = new Date(year, BDAY_MONTH - 1, BDAY_DAY, 0, 0, 0);
-  if (bday < now) bday = new Date(year + 1, BDAY_MONTH - 1, BDAY_DAY, 0, 0, 0);
-
-  const isToday = (now.getMonth() + 1 === BDAY_MONTH && now.getDate() === BDAY_DAY);
-
-  if (isToday) {
-    /* === ES EL CUMPLEAÑOS === */
-    const banner = document.getElementById("bday-banner");
-    banner.classList.add("show");
-    document.getElementById("bday-countdown").textContent = "✨ ¡Hoy es el gran día! ✨";
-
-    /* Confetti */
-    const confDiv = document.getElementById("bday-confetti");
-    const COLORS  = ["#C9A8E8","#FF9EE0","#FFD4F5","#7B5EA7","#F5BBFF","#FFB3C6"];
-    for (let i = 0; i < 38; i++) {
-      const p = document.createElement("div");
-      p.className = "conf-piece";
-      p.style.left        = Math.random() * 100 + "%";
-      p.style.top         = "-12px";
-      p.style.background  = COLORS[Math.floor(Math.random() * COLORS.length)];
-      p.style.animationDuration  = (1.6 + Math.random() * 2) + "s";
-      p.style.animationDelay     = (Math.random() * 3) + "s";
-      p.style.borderRadius       = Math.random() > .5 ? "50%" : "2px";
-      p.style.width  = (5 + Math.random() * 7) + "px";
-      p.style.height = (5 + Math.random() * 7) + "px";
-      confDiv.appendChild(p);
-    }
-
-    /* Lluvia de corazones por toda la pantalla */
-    const rain = document.getElementById("heart-rain");
-    rain.classList.add("show");
-    const HEARTS = ["💜","💖","🩷","✨","💕"];
-    function dropHeart(){
-      const h = document.createElement("div");
-      h.className = "heart-drop";
-      h.textContent = HEARTS[Math.floor(Math.random() * HEARTS.length)];
-      h.style.left = Math.random() * 100 + "%";
-      h.style.fontSize = (14 + Math.random() * 16) + "px";
-      const dur = 5 + Math.random() * 4;
-      h.style.animationDuration = dur + "s";
-      rain.appendChild(h);
-      setTimeout(() => h.remove(), dur * 1000 + 200);
-    }
-    for (let i = 0; i < 12; i++) setTimeout(dropHeart, i * 250);
-    setInterval(dropHeart, 700);
-  } else {
-    /* === CUENTA REGRESIVA === */
-    const bar = document.getElementById("countdown-bar");
-    bar.classList.add("show");
-    function tick() {
-      const n   = new Date();
-      let target = new Date(n.getFullYear(), BDAY_MONTH - 1, BDAY_DAY, 0, 0, 0);
-      if (target < n) target = new Date(n.getFullYear() + 1, BDAY_MONTH - 1, BDAY_DAY, 0, 0, 0);
-      const diff = target - n;
-      const days = Math.floor(diff / 86400000);
-      const hrs  = Math.floor((diff % 86400000) / 3600000);
-      const mins = Math.floor((diff % 3600000)  / 60000);
-      document.getElementById("cd-days").textContent  = days;
-      document.getElementById("cd-hours").textContent = hrs;
-      document.getElementById("cd-mins").textContent  = String(mins).padStart(2,"0");
-    }
-    tick(); setInterval(tick, 30000);
-  }
-})();
-
-/* ==== CHIBI — FRASES + EASTER EGG ====
-   ✏️ peso: número que indica qué tan seguido sale esa frase (peso más alto = más probable) */
-const CHIBI_FRASES = [
-  { texto:"¡Hola! 💜", peso:1 },
-  { texto:"¡Gracias por venir a verme! 🌸", peso:1 },
-  { texto:"¿Qué dice una cereza cuando se ve al espejo? ¿Seré esa? 🍒 ¡¡JAJA!!", peso:1 },
-  { texto:"Shhh… no hagas ruido, mis corderitos duermen 🐑💤", peso:1 },
-  { texto:"¡Espero verte en mi stream! 🎀", peso:1 },
-  { texto:"🎈 wekito", peso:1 },
-];
-/* ==== INDICADOR "EN VIVO" DE TWITCH ====
-   Cambia este nombre por el canal real de Twitch de LadyGowi: */
-/* ==== JUEGOS ====
-   nota: 1-5 (ovejas) | rec: "si" | "no" | "tal" | imagen: ruta de la portada del juego
-   La imagen de oveja rota entre las 4 de manera aleatoria por juego */
-const OVEJA_IMGS = [
-  "imagenes/ovejas/oveja1.png",
-  "imagenes/ovejas/oveja2.png",
-  "imagenes/ovejas/oveja3.png",
-  "imagenes/ovejas/oveja4.png",
-];
-const JUEGOS = [
-  /* ejemplo — borra esta línea y agrega tus juegos:
-  { titulo:"Nombre del juego", nota:4, rec:"si", nota_texto:"Muy divertido, lo recomiendo mucho 💜" },
-  */
-];
 const REC_LABEL = { si:"✅ Recomienda", no:"❌ No recomienda", tal:"🤔 Tal vez" };
 
 let currentGamesSearch="", gamesSort="default";
@@ -1083,7 +896,6 @@ function switchTab(tab){
   setTimeout(()=>window.dispatchEvent(new Event("resize")), 50);
 }
 
-const TWITCH_CHANNEL = "ladygowi";
 
 async function checkTwitchLive(){
   const badge=document.getElementById("twitch-live-badge");
@@ -1105,7 +917,6 @@ window.addEventListener("scroll", ()=>{
   fabs.forEach(f=>f.classList.toggle("show", show));
 }, {passive:true});
 
-const CHIBI_EGG = "✨ Shhh… sólo tú sabes esto: Eres mi persona favorita!! 🤫💜✨";
 
 (function scheduleChibiShake(){
   const next=()=>{

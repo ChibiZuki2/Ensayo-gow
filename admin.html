@@ -45,6 +45,16 @@ button{font-family:'Inter',sans-serif;cursor:pointer;border:none}
 .dropzone-text{font-size:13px;color:var(--text)}
 .dropzone-sub{font-size:11px;color:var(--text2);margin-top:4px}
 .dropzone input[type=file]{display:none}
+.compress-bar{background:var(--bg2);border:.5px solid var(--border-c);border-radius:12px;padding:10px 14px;margin-top:.8rem;display:none}
+.compress-bar.show{display:block}
+.compress-row{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.compress-row label{font-size:12px;color:var(--text2);white-space:nowrap}
+.compress-row input[type=range]{flex:1;min-width:80px;accent-color:var(--accent)}
+.compress-val{font-size:12px;font-weight:600;color:var(--accent-light);min-width:30px}
+.compress-info{margin-top:6px;font-size:11px;color:var(--text2);display:flex;gap:12px;flex-wrap:wrap}
+.compress-info .ci-before{color:var(--text2)}
+.compress-info .ci-after{color:#7ecb9e}
+.compress-info .ci-saving{color:var(--accent-light);font-weight:600}
 .preview-wrap{display:none;text-align:center}
 .preview-wrap.show{display:block}
 .preview-wrap img{max-width:100%;max-height:260px;border-radius:12px;border:.5px solid var(--border-c)}
@@ -182,6 +192,16 @@ body.locked .wrap{display:none}
         <div class="preview-name" id="preview-name"></div>
       </div>
     </div>
+
+    <div class="compress-bar" id="compress-bar">
+      <div class="compress-row">
+        <label>🗜️ Calidad de compresión:</label>
+        <input type="range" id="compress-quality" min="50" max="100" value="82" oninput="recompress()"/>
+        <span class="compress-val" id="compress-val">82%</span>
+      </div>
+      <div class="compress-info" id="compress-info"></div>
+    </div>
+
     <div class="field" style="margin-top:1.2rem;">
       <label>Título del fanart</label>
       <input type="text" id="f-titulo" placeholder="Ej: LadyGowi en su cumpleaños" oninput="updateLivePreview()"/>
@@ -489,16 +509,30 @@ function addCategory(){
   if(CATEGORIES.includes(val)){ alert("Esa categoría ya existe."); return; }
   CATEGORIES.push(val); input.value="";
   renderCatChips(); renderCatSelect();
+  saveCategoriesToData();
 }
 function removeCategory(c){
   if(CATEGORIES.length<=1){ alert("Debe quedar al menos una categoría."); return; }
   CATEGORIES=CATEGORIES.filter(x=>x!==c);
   renderCatChips(); renderCatSelect();
+  saveCategoriesToData();
+}
+async function saveCategoriesToData(){
+  if(!cfg.token) return;
+  try{
+    const file=await getFile("data.js");
+    const content=base64ToUtf8(file.content);
+    const newLine=`const CATEGORIES = [${CATEGORIES.map(c=>`"${c}"`).join(",")}];`;
+    const newContent=content.replace(/const CATEGORIES = \[[^\]]*\];/, newLine);
+    await putFile("data.js",utf8ToBase64(newContent),"Actualiza categorías",file.sha);
+  }catch(e){ console.warn("No se pudieron guardar las categorías:", e.message); }
 }
 renderCatChips(); renderCatSelect();
 
 /* ==== DROPZONE ==== */
 let currentFile=null;
+let _originalImage=null; // guardamos la imagen original para recomprimir sin recargar
+
 const dropzone=document.getElementById("dropzone");
 ["dragenter","dragover"].forEach(ev=>dropzone.addEventListener(ev,e=>{ e.preventDefault(); dropzone.classList.add("drag"); }));
 ["dragleave","drop"].forEach(ev=>dropzone.addEventListener(ev,e=>{ e.preventDefault(); dropzone.classList.remove("drag"); }));
@@ -506,16 +540,52 @@ dropzone.addEventListener("drop",e=>{ const f=e.dataTransfer.files[0]; if(f) han
 
 function handleFile(file){
   if(!file||!file.type.startsWith("image/")){ alert("Por favor selecciona un archivo de imagen."); return; }
+  _originalImage={ name:sanitizeFilename(file.name.replace(/\.\w+$/,".webp")), sizeMB:file.size, mime:file.type };
   const reader=new FileReader();
   reader.onload=e=>{
-    currentFile={name:sanitizeFilename(file.name),base64:e.target.result.split(",")[1],mime:file.type};
+    _originalImage.dataUrl=e.target.result;
     document.getElementById("preview-img").src=e.target.result;
-    document.getElementById("preview-name").textContent=currentFile.name;
+    document.getElementById("preview-name").textContent=file.name;
     document.getElementById("dropzone-empty").style.display="none";
     document.getElementById("preview-wrap").classList.add("show");
+    document.getElementById("compress-bar").classList.add("show");
+    recompress();
     updateLivePreview();
   };
   reader.readAsDataURL(file);
+}
+
+function recompress(){
+  if(!_originalImage?.dataUrl) return;
+  const quality=parseInt(document.getElementById("compress-quality").value)/100;
+  document.getElementById("compress-val").textContent=Math.round(quality*100)+"%";
+  const img=new Image();
+  img.onload=()=>{
+    const canvas=document.createElement("canvas");
+    // max 1800px on longest side to avoid huge files
+    const maxSide=1800;
+    let w=img.width, h=img.height;
+    if(w>maxSide||h>maxSide){
+      if(w>h){ h=Math.round(h*maxSide/w); w=maxSide; }
+      else{ w=Math.round(w*maxSide/h); h=maxSide; }
+    }
+    canvas.width=w; canvas.height=h;
+    canvas.getContext("2d").drawImage(img,0,0,w,h);
+    const dataUrl=canvas.toDataURL("image/webp",quality);
+    const base64=dataUrl.split(",")[1];
+    const compressedKB=Math.round(base64.length*0.75/1024);
+    const originalKB=Math.round(_originalImage.sizeMB/1024);
+    const saving=Math.round((1-compressedKB/originalKB)*100);
+    currentFile={ name:_originalImage.name, base64, mime:"image/webp" };
+    document.getElementById("compress-info").innerHTML=`
+      <span class="ci-before">Original: ${originalKB>1024?(originalKB/1024).toFixed(1)+"MB":originalKB+"KB"}</span>
+      <span class="ci-after">→ Comprimida: ${compressedKB}KB</span>
+      ${saving>0?`<span class="ci-saving">✓ ${saving}% más liviana</span>`:"<span style='color:var(--text2)'>Sin cambio significativo</span>"}
+      <span style="color:var(--text2)">(${w}×${h}px)</span>`;
+    document.getElementById("preview-img").src=dataUrl;
+    updateLivePreview();
+  };
+  img.src=_originalImage.dataUrl;
 }
 function updateLivePreview(){
   const titulo=document.getElementById("f-titulo").value.trim();
@@ -564,12 +634,12 @@ async function loadGalleryManage(){
   if(!cfg.token){ box.innerHTML='<div class="manage-empty" style="color:var(--err)">Conecta tu token primero.</div>'; return; }
   box.innerHTML='<div class="manage-empty">Cargando...</div>';
   try{
-    const file=await getFile("index.html");
-    window._idxFile=file;
+    const file=await getFile("data.js");
+    window._dataFile=file;
     const content=base64ToUtf8(file.content);
-    window._idxLines=content.split("\n");
+    window._dataLines=content.split("\n");
     const items=[];
-    window._idxLines.forEach((line,i)=>{
+    window._dataLines.forEach((line,i)=>{
       const m=line.match(IMG_LINE_RE);
       if(m) items.push({lineIndex:i,src:unesc(m[2]),titulo:unesc(m[3]),artista:unesc(m[4]),categoria:m[5],fecha:m[6],placeholder:unesc(m[7]),nota:unesc(m[8]),destacado:m[9]==="true"});
     });
@@ -652,16 +722,16 @@ function toggleEdit(lineIndex){
 
 async function saveImageEdit(lineIndex){
   const item=window._galleryItems.find(x=>x.lineIndex===lineIndex);
-  const indent=window._idxLines[lineIndex].match(/^(\s*)/)[1];
+  const indent=window._dataLines[lineIndex].match(/^(\s*)/)[1];
   const titulo=document.getElementById(`e-titulo-${lineIndex}`).value.trim();
   const artista=document.getElementById(`e-artista-${lineIndex}`).value.trim();
   const categoria=document.getElementById(`e-categoria-${lineIndex}`).value;
   const nota=document.getElementById(`e-nota-${lineIndex}`).value.trim();
   const destacado=document.getElementById(`e-destacado-${lineIndex}`).checked;
   const newLine=`${indent}{ src:"${item.src}", titulo:"${esc(titulo)}", artista:"${esc(artista)}", categoria:"${categoria}", fecha:"${item.fecha}", placeholder:"${item.placeholder}", nota:"${esc(nota)}", destacado:${destacado} },`;
-  const lines=window._idxLines.slice(); lines[lineIndex]=newLine;
+  const lines=window._dataLines.slice(); lines[lineIndex]=newLine;
   try{
-    await putFile("index.html",utf8ToBase64(lines.join("\n")),`Edita fanart: ${titulo}`,window._idxFile.sha);
+    await putFile("data.js",utf8ToBase64(lines.join("\n")),`Edita fanart: ${titulo}`,window._dataFile.sha);
     await loadGalleryManage();
   }catch(e){ alert("Error al guardar: "+e.message); }
 }
@@ -670,8 +740,8 @@ async function deleteImage(lineIndex){
   const item=window._galleryItems.find(x=>x.lineIndex===lineIndex);
   if(!confirm(`¿Eliminar "${item.titulo}"? Esto la quita de la galería y borra el archivo de imagen.`)) return;
   try{
-    const lines=window._idxLines.slice(); lines.splice(lineIndex,1);
-    await putFile("index.html",utf8ToBase64(lines.join("\n")),`Elimina fanart: ${item.titulo}`,window._idxFile.sha);
+    const lines=window._dataLines.slice(); lines.splice(lineIndex,1);
+    await putFile("data.js",utf8ToBase64(lines.join("\n")),`Elimina fanart: ${item.titulo}`,window._dataFile.sha);
     try{ const imgFile=await getFile(item.src); await deleteFile(item.src,`Elimina archivo de imagen: ${item.titulo}`,imgFile.sha); }catch(e){}
     await loadGalleryManage();
   }catch(e){ alert("Error al eliminar: "+e.message); }
@@ -693,12 +763,12 @@ async function loadMusicManage(){
   if(!cfg.token){ box.innerHTML='<div class="manage-empty" style="color:var(--err)">Conecta tu token primero.</div>'; return; }
   box.innerHTML='<div class="manage-empty">Cargando...</div>';
   try{
-    const file=await getFile("index.html");
-    window._idxFile=file;
+    const file=await getFile("data.js");
+    window._dataFile=file;
     const content=base64ToUtf8(file.content);
-    window._idxLines=content.split("\n");
+    window._dataLines=content.split("\n");
     const songs=[];
-    window._idxLines.forEach((line,i)=>{
+    window._dataLines.forEach((line,i)=>{
       const m=line.match(SONG_LINE_RE);
       if(m) songs.push({lineIndex:i,titulo:unesc(m[2]),youtubeId:m[3]});
     });
@@ -729,8 +799,8 @@ async function deleteSong(lineIndex){
   if(window._songItems.length<=1){ alert("Debe quedar al menos una canción."); return; }
   if(!confirm(`¿Eliminar la canción "${song.titulo}"?`)) return;
   try{
-    const lines=window._idxLines.slice(); lines.splice(lineIndex,1);
-    await putFile("index.html",utf8ToBase64(lines.join("\n")),`Elimina canción: ${song.titulo}`,window._idxFile.sha);
+    const lines=window._dataLines.slice(); lines.splice(lineIndex,1);
+    await putFile("data.js",utf8ToBase64(lines.join("\n")),`Elimina canción: ${song.titulo}`,window._dataFile.sha);
     await loadMusicManage();
   }catch(e){ alert("Error al eliminar: "+e.message); }
 }
@@ -742,14 +812,14 @@ async function addSong(){
   const youtubeId=extractYoutubeId(url);
   if(!titulo||!youtubeId){ alert("Escribe un título y un link/ID de YouTube válido."); return; }
   try{
-    const file=await getFile("index.html");
+    const file=await getFile("data.js");
     const content=base64ToUtf8(file.content);
     const marker="const CANCIONES = [\n";
     const idx=content.indexOf(marker);
     if(idx===-1) throw new Error("No se encontró el array CANCIONES.");
     const newLine=`  { titulo:"${esc(titulo)}", youtubeId:"${youtubeId}" },\n`;
     const newContent=content.slice(0,idx+marker.length)+newLine+content.slice(idx+marker.length);
-    await putFile("index.html",utf8ToBase64(newContent),`Agrega canción: ${titulo}`,file.sha);
+    await putFile("data.js",utf8ToBase64(newContent),`Agrega canción: ${titulo}`,file.sha);
     document.getElementById("song-titulo").value="";
     document.getElementById("song-url").value="";
     await loadMusicManage();
@@ -764,12 +834,12 @@ async function loadSoundsManage(){
   if(!cfg.token){ box.innerHTML='<div class="manage-empty" style="color:var(--err)">Conecta tu token primero.</div>'; return; }
   box.innerHTML='<div class="manage-empty">Cargando...</div>';
   try{
-    const file=await getFile("index.html");
-    window._idxFile=file;
+    const file=await getFile("data.js");
+    window._dataFile=file;
     const content=base64ToUtf8(file.content);
-    window._idxLines=content.split("\n");
+    window._dataLines=content.split("\n");
     const sounds=[];
-    window._idxLines.forEach((line,i)=>{
+    window._dataLines.forEach((line,i)=>{
       const m=line.match(SOUND_LINE_RE);
       if(m) sounds.push({lineIndex:i,tipo:m[2],nombre:unesc(m[3]),archivo:m[4],peso:m[5]?parseInt(m[5]):1});
     });
@@ -809,8 +879,8 @@ async function deleteSound(lineIndex){
   if(sameType.length<=1){ alert(`Debe quedar al menos un sonido de tipo "${sound.tipo}".`); return; }
   if(!confirm(`¿Eliminar el sonido "${sound.nombre}"? (el archivo de audio seguirá en el repositorio, solo se quita de la lista)`)) return;
   try{
-    const lines=window._idxLines.slice(); lines.splice(lineIndex,1);
-    await putFile("index.html",utf8ToBase64(lines.join("\n")),`Elimina sonido: ${sound.nombre}`,window._idxFile.sha);
+    const lines=window._dataLines.slice(); lines.splice(lineIndex,1);
+    await putFile("data.js",utf8ToBase64(lines.join("\n")),`Elimina sonido: ${sound.nombre}`,window._dataFile.sha);
     await loadSoundsManage();
   }catch(e){ alert("Error al eliminar: "+e.message); }
 }
@@ -834,14 +904,14 @@ async function addSound(){
     const soundPath = `sonidos/${cleanName}`;
     await putFile(soundPath, base64, `Sube sonido: ${nombre}`);
 
-    const idxFile=await getFile("index.html");
+    const idxFile=await getFile("data.js");
     const content=base64ToUtf8(idxFile.content);
     const marker="const SONIDOS = [\n";
     const idx=content.indexOf(marker);
     if(idx===-1) throw new Error("No se encontró el array SONIDOS.");
     const newLine=`  { tipo:"${tipo}", nombre:"${esc(nombre)}", archivo:"${soundPath}", peso:${peso} },\n`;
     const newContent=content.slice(0,idx+marker.length)+newLine+content.slice(idx+marker.length);
-    await putFile("index.html",utf8ToBase64(newContent),`Agrega sonido: ${nombre}`,idxFile.sha);
+    await putFile("data.js",utf8ToBase64(newContent),`Agrega sonido: ${nombre}`,idxFile.sha);
 
     document.getElementById("sound-nombre").value="";
     document.getElementById("sound-peso").value="1";
@@ -858,12 +928,12 @@ async function loadPhrasesManage(){
   if(!cfg.token){ box.innerHTML='<div class="manage-empty" style="color:var(--err)">Conecta tu token primero.</div>'; return; }
   box.innerHTML='<div class="manage-empty">Cargando...</div>';
   try{
-    const file=await getFile("index.html");
-    window._idxFile=file;
+    const file=await getFile("data.js");
+    window._dataFile=file;
     const content=base64ToUtf8(file.content);
-    window._idxLines=content.split("\n");
+    window._dataLines=content.split("\n");
     const phrases=[];
-    window._idxLines.forEach((line,i)=>{
+    window._dataLines.forEach((line,i)=>{
       const m=line.match(PHRASE_LINE_RE);
       if(m) phrases.push({lineIndex:i,texto:unesc(m[2]),peso:parseInt(m[3])});
     });
@@ -896,8 +966,8 @@ async function deletePhrase(lineIndex){
   if(window._phraseItems.length<=1){ alert("Debe quedar al menos una frase."); return; }
   if(!confirm(`¿Eliminar la frase "${phrase.texto}"?`)) return;
   try{
-    const lines=window._idxLines.slice(); lines.splice(lineIndex,1);
-    await putFile("index.html",utf8ToBase64(lines.join("\n")),`Elimina frase de la chibi`,window._idxFile.sha);
+    const lines=window._dataLines.slice(); lines.splice(lineIndex,1);
+    await putFile("data.js",utf8ToBase64(lines.join("\n")),`Elimina frase de la chibi`,window._dataFile.sha);
     await loadPhrasesManage();
   }catch(e){ alert("Error al eliminar: "+e.message); }
 }
@@ -908,14 +978,14 @@ async function addPhrase(){
   const peso=Math.max(1,parseInt(document.getElementById("phrase-peso").value)||1);
   if(!texto){ alert("Escribe una frase."); return; }
   try{
-    const file=await getFile("index.html");
+    const file=await getFile("data.js");
     const content=base64ToUtf8(file.content);
     const marker="const CHIBI_FRASES = [\n";
     const idx=content.indexOf(marker);
     if(idx===-1) throw new Error("No se encontró el array CHIBI_FRASES.");
     const newLine=`  { texto:"${esc(texto)}", peso:${peso} },\n`;
     const newContent=content.slice(0,idx+marker.length)+newLine+content.slice(idx+marker.length);
-    await putFile("index.html",utf8ToBase64(newContent),`Agrega frase de la chibi`,file.sha);
+    await putFile("data.js",utf8ToBase64(newContent),`Agrega frase de la chibi`,file.sha);
     document.getElementById("phrase-texto").value="";
     document.getElementById("phrase-peso").value="1";
     await loadPhrasesManage();
@@ -930,12 +1000,12 @@ async function loadSheepIcons(){
   if(!cfg.token){ box.innerHTML='<div class="manage-empty" style="color:var(--err)">Conecta tu token primero.</div>'; return; }
   box.innerHTML='<div class="manage-empty">Cargando...</div>';
   try{
-    const file=await getFile("index.html");
-    window._idxFile=file;
+    const file=await getFile("data.js");
+    window._dataFile=file;
     const content=base64ToUtf8(file.content);
-    window._idxLines=content.split("\n");
+    window._dataLines=content.split("\n");
     const icons=[];
-    window._idxLines.forEach((line,i)=>{
+    window._dataLines.forEach((line,i)=>{
       const m=line.match(OVEJA_LINE_RE);
       if(m) icons.push({lineIndex:i, path:m[2]});
     });
@@ -968,8 +1038,8 @@ async function deleteSheepIcon(lineIndex){
   if(window._sheepIconItems.length<=1){ alert("Debe quedar al menos un icono de oveja."); return; }
   if(!confirm(`¿Quitar el icono "${icon.path.split("/").pop()}" de la lista?`)) return;
   try{
-    const lines=window._idxLines.slice(); lines.splice(lineIndex,1);
-    await putFile("index.html",utf8ToBase64(lines.join("\n")),`Quita icono oveja: ${icon.path}`,window._idxFile.sha);
+    const lines=window._dataLines.slice(); lines.splice(lineIndex,1);
+    await putFile("data.js",utf8ToBase64(lines.join("\n")),`Quita icono oveja: ${icon.path}`,window._dataFile.sha);
     await loadSheepIcons();
   }catch(e){ alert("Error: "+e.message); }
 }
@@ -990,14 +1060,14 @@ async function addSheepIcon(){
     const iconPath=`imagenes/ovejas/${cleanName}`;
     await putFile(iconPath,base64,`Sube icono oveja: ${cleanName}`);
 
-    const idxFile=await getFile("index.html");
+    const idxFile=await getFile("data.js");
     const content=base64ToUtf8(idxFile.content);
     const marker='const OVEJA_IMGS = [\n';
     const idx=content.indexOf(marker);
     if(idx===-1) throw new Error("No se encontró el array OVEJA_IMGS.");
     const newLine=`  "${iconPath}",\n`;
     const newContent=content.slice(0,idx+marker.length)+newLine+content.slice(idx+marker.length);
-    await putFile("index.html",utf8ToBase64(newContent),`Agrega icono oveja: ${cleanName}`,idxFile.sha);
+    await putFile("data.js",utf8ToBase64(newContent),`Agrega icono oveja: ${cleanName}`,idxFile.sha);
     fileInput.value="";
     await loadSheepIcons();
   }catch(e){ alert("Error al subir: "+e.message); }
@@ -1010,10 +1080,10 @@ const LORE_META_RE=/^\s*\{\s*ico:"((?:\\.|[^"\\])*)",\s*txt:"((?:\\.|[^"\\]*))"(
 async function loadLore(){
   if(!cfg.token){ alert("Conecta tu token primero."); return; }
   try{
-    const file=await getFile("index.html");
-    window._idxFile=file;
+    const file=await getFile("data.js");
+    window._dataFile=file;
     const content=base64ToUtf8(file.content);
-    window._idxLines=content.split("\n");
+    window._dataLines=content.split("\n");
 
     const quienMatch=content.match(/quien:\s*"((?:\\.|[^"\\])*)"/);
     if(quienMatch) document.getElementById("lore-quien-input").value=unesc(quienMatch[1]);
@@ -1044,10 +1114,10 @@ async function saveLore(){
   const quien=document.getElementById("lore-quien-input").value.trim();
   if(!quien){ alert("Escribe algo en la bio."); return; }
   try{
-    const file=await getFile("index.html");
+    const file=await getFile("data.js");
     const content=base64ToUtf8(file.content);
     const newContent=content.replace(/quien:\s*"(?:\\.|[^"\\])*"/, `quien: "${esc(quien)}"`);
-    await putFile("index.html",utf8ToBase64(newContent),"Edita lore: bio",file.sha);
+    await putFile("data.js",utf8ToBase64(newContent),"Edita lore: bio",file.sha);
     document.getElementById("lore-log").textContent="✓ Bio guardada.";
     setTimeout(()=>document.getElementById("lore-log").textContent="",3000);
   }catch(e){ alert("Error: "+e.message); }
@@ -1058,14 +1128,14 @@ async function deleteMeta(idx){
   if(window._loreMetaItems.length<=1){ alert("Debe haber al menos una meta."); return; }
   if(!confirm(`¿Eliminar la meta "${meta.txt}"?`)) return;
   try{
-    const file=await getFile("index.html");
+    const file=await getFile("data.js");
     const content=base64ToUtf8(file.content);
     const newContent=content.replace(/\s*\{\s*ico:"(?:\\.|[^"\\])*",\s*txt:"(?:\\.|[^"\\])*"(?:\s*)\},?/,
       (match,offset)=> offset===meta.idx-content.slice(0,meta.idx).search(/\s*\{/)? "" : match);
     // simpler: replace the raw meta entry
     const escaped=meta.raw.replace(/[.*+?^${}()|[\]\\]/g,'\\$&');
     const cleaned=content.replace(new RegExp(',?\\s*'+escaped),'');
-    await putFile("index.html",utf8ToBase64(cleaned),"Elimina meta de lore",file.sha);
+    await putFile("data.js",utf8ToBase64(cleaned),"Elimina meta de lore",file.sha);
     await loadLore();
   }catch(e){ alert("Error: "+e.message); }
 }
@@ -1076,14 +1146,14 @@ async function addMeta(){
   const txt=document.getElementById("meta-txt").value.trim();
   if(!txt){ alert("Escribe el texto de la meta."); return; }
   try{
-    const file=await getFile("index.html");
+    const file=await getFile("data.js");
     const content=base64ToUtf8(file.content);
     const marker="  metas: [\n";
     const idx=content.indexOf(marker);
     if(idx===-1) throw new Error("No se encontró el array metas.");
     const newLine=`    { ico:"${esc(ico)}", txt:"${esc(txt)}" },\n`;
     const newContent=content.slice(0,idx+marker.length)+newLine+content.slice(idx+marker.length);
-    await putFile("index.html",utf8ToBase64(newContent),"Agrega meta de lore",file.sha);
+    await putFile("data.js",utf8ToBase64(newContent),"Agrega meta de lore",file.sha);
     document.getElementById("meta-ico").value="";
     document.getElementById("meta-txt").value="";
     await loadLore();
@@ -1098,12 +1168,12 @@ async function loadGamesManage(){
   if(!cfg.token){ box.innerHTML='<div class="manage-empty" style="color:var(--err)">Conecta tu token primero.</div>'; return; }
   box.innerHTML='<div class="manage-empty">Cargando...</div>';
   try{
-    const file=await getFile("index.html");
-    window._idxFile=file;
+    const file=await getFile("data.js");
+    window._dataFile=file;
     const content=base64ToUtf8(file.content);
-    window._idxLines=content.split("\n");
+    window._dataLines=content.split("\n");
     const games=[];
-    window._idxLines.forEach((line,i)=>{
+    window._dataLines.forEach((line,i)=>{
       const m=line.match(GAME_LINE_RE);
       if(m) games.push({lineIndex:i,titulo:unesc(m[2]),nota:parseInt(m[3]),rec:m[4],nota_texto:unesc(m[5]),imagen:m[6]||""});
     });
@@ -1139,8 +1209,8 @@ async function deleteGame(lineIndex){
   const game=window._gameItems.find(x=>x.lineIndex===lineIndex);
   if(!confirm(`¿Eliminar el juego "${game.titulo}"?`)) return;
   try{
-    const lines=window._idxLines.slice(); lines.splice(lineIndex,1);
-    await putFile("index.html",utf8ToBase64(lines.join("\n")),`Elimina juego: ${game.titulo}`,window._idxFile.sha);
+    const lines=window._dataLines.slice(); lines.splice(lineIndex,1);
+    await putFile("data.js",utf8ToBase64(lines.join("\n")),`Elimina juego: ${game.titulo}`,window._dataFile.sha);
     await loadGamesManage();
   }catch(e){ alert("Error al eliminar: "+e.message); }
 }
@@ -1167,14 +1237,14 @@ async function addGame(){
       imagenPath=`imagenes/juegos/${cleanName}`;
       await putFile(imagenPath,base64,`Sube portada: ${titulo}`);
     }
-    const file=await getFile("index.html");
+    const file=await getFile("data.js");
     const content=base64ToUtf8(file.content);
     const marker="const JUEGOS = [\n";
     const idx=content.indexOf(marker);
     if(idx===-1) throw new Error("No se encontró el array JUEGOS.");
     const newLine=`  { titulo:"${esc(titulo)}", nota:${nota}, rec:"${rec}", nota_texto:"${esc(nota_texto)}"${imagenPath?`, imagen:"${imagenPath}"`:"" } },\n`;
     const newContent=content.slice(0,idx+marker.length)+newLine+content.slice(idx+marker.length);
-    await putFile("index.html",utf8ToBase64(newContent),`Agrega juego: ${titulo}`,file.sha);
+    await putFile("data.js",utf8ToBase64(newContent),`Agrega juego: ${titulo}`,file.sha);
     document.getElementById("game-titulo").value="";
     document.getElementById("game-nota-texto").value="";
     document.getElementById("game-nota").value="3";
@@ -1196,7 +1266,7 @@ function clearLog(){ const log=document.getElementById("log"); log.innerHTML="";
 async function loadCategoriesFromRepo(){
   if(!cfg.token) return;
   try{
-    const file=await getFile("index.html");
+    const file=await getFile("data.js");
     const content=base64ToUtf8(file.content);
     const match=content.match(/const IMAGENES = \[([\s\S]*?)\];/);
     if(match){
@@ -1230,24 +1300,27 @@ async function publish(){
     await putFile(imgPath,currentFile.base64,`Sube fanart: ${titulo}`);
     logLine("✓ Imagen subida correctamente.","ok");
 
-    logLine("Actualizando la galería (index.html)...","info");
-    const file=await getFile("index.html");
+    logLine("Actualizando la galería (data.js)...","info");
+    const file=await getFile("data.js");
     const content=base64ToUtf8(file.content);
     const fecha=new Date().toISOString().slice(0,10);
     const newEntry=`      { src:"${imgPath}", titulo:"${esc(titulo)}", artista:"${esc(artista)}", categoria:"${categoria}", fecha:"${fecha}", placeholder:"🎨", nota:"${esc(nota)}", destacado:${destacado} },\n`;
     const marker="const IMAGENES = [\n";
     const idx=content.indexOf(marker);
-    if(idx===-1) throw new Error("No se encontró el array IMAGENES en index.html — revisa que no se haya editado la estructura.");
+    if(idx===-1) throw new Error("No se encontró el array IMAGENES en data.js — revisa que el archivo esté bien.");
     const newContent=content.slice(0,idx+marker.length)+newEntry+content.slice(idx+marker.length);
-    await putFile("index.html",utf8ToBase64(newContent),`Agrega fanart: ${titulo}`,file.sha);
+    await putFile("data.js",utf8ToBase64(newContent),`Agrega fanart: ${titulo}`,file.sha);
     logLine("✓ Galería actualizada.","ok");
     logLine("🎉 ¡Listo! Tu web pública se actualizará en 1-2 minutos.","ok");
 
     // reset
     currentFile=null;
+    _originalImage=null;
     document.getElementById("file-input").value="";
     document.getElementById("dropzone-empty").style.display="block";
     document.getElementById("preview-wrap").classList.remove("show");
+    document.getElementById("compress-bar").classList.remove("show");
+    document.getElementById("compress-info").innerHTML="";
     ["f-titulo","f-artista","f-nota"].forEach(id=>document.getElementById(id).value="");
     document.getElementById("f-destacado").checked=false;
     document.getElementById("preview-img").src="";
