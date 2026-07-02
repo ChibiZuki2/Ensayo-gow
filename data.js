@@ -80,7 +80,6 @@ const IMAGENES = [
 const OVEJA_IMGS = [
   "imagenes/ovejas/1782963075897-oveja2.png",
   "imagenes/ovejas/1782963062073-oveja1.png",
-  "imagenes/ovejas/oveja3.png",
   "imagenes/ovejas/oveja4.png",
 ];
 
