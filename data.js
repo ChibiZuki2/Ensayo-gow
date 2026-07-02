@@ -45,6 +45,7 @@ const CANCIONES = [
    peso: número — más alto = sale más seguido
    ============================ */
 const SONIDOS = [
+  { tipo:"campana", nombre:"Campanita", archivo:"sonidos/1782963194908-campanita1.mp3", peso:1 },
   { tipo:"chibi",   nombre:"Oveja pequeña", archivo:"sonidos/small-sheep.mp3", peso:1 },
   { tipo:"chibi",   nombre:"Oveja grande",  archivo:"sonidos/monsheep.mp3",    peso:1 },
   { tipo:"campana", nombre:"Campanas",      archivo:"sonidos/sheep-bells.mp3", peso:1 },
