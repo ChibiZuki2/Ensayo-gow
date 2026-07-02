@@ -46,7 +46,6 @@ const CANCIONES = [
    ============================ */
 const SONIDOS = [
   { tipo:"chibi", nombre:"Oveja chikita", archivo:"sonidos/1782982727634-ovejita-chikita.mp3", peso:1 },
-  { tipo:"chibi",   nombre:"Oveja grande",  archivo:"sonidos/monsheep.mp3",    peso:1 },
   { tipo:"campana", nombre:"Campanas",      archivo:"sonidos/sheep-bells.mp3", peso:1 },
 ];
 
