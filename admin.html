@@ -524,7 +524,7 @@ async function saveCategoriesToData(){
     const content=base64ToUtf8(file.content);
     const newLine=`const CATEGORIES = [${CATEGORIES.map(c=>`"${c}"`).join(",")}];`;
     const newContent=content.replace(/const CATEGORIES = \[[^\]]*\];/, newLine);
-    await putFile("data.js",utf8ToBase64(newContent),"Actualiza categorías",file.sha);
+    await freshPut("data.js",utf8ToBase64(newContent),"Actualiza categorías");
   }catch(e){ console.warn("No se pudieron guardar las categorías:", e.message); }
 }
 renderCatChips(); renderCatSelect();
@@ -618,6 +618,12 @@ const getFile=path=>ghRequest(`/repos/${cfg.owner}/${cfg.repo}/contents/${encode
 const putFile=(path,content,message,sha)=>ghRequest(`/repos/${cfg.owner}/${cfg.repo}/contents/${path}`,{
   method:"PUT",body:JSON.stringify({message,content,...(sha?{sha}:{})})
 });
+
+/* Siempre obtiene el SHA fresco antes de escribir — evita el error 409 */
+async function freshPut(path, content, message){
+  const current = await getFile(path);
+  return putFile(path, content, message, current.sha);
+}
 const deleteFile=(path,message,sha)=>ghRequest(`/repos/${cfg.owner}/${cfg.repo}/contents/${encodeURIComponent(path)}`,{
   method:"DELETE",body:JSON.stringify({message,sha})
 });
@@ -731,7 +737,7 @@ async function saveImageEdit(lineIndex){
   const newLine=`${indent}{ src:"${item.src}", titulo:"${esc(titulo)}", artista:"${esc(artista)}", categoria:"${categoria}", fecha:"${item.fecha}", placeholder:"${item.placeholder}", nota:"${esc(nota)}", destacado:${destacado} },`;
   const lines=window._dataLines.slice(); lines[lineIndex]=newLine;
   try{
-    await putFile("data.js",utf8ToBase64(lines.join("\n")),`Edita fanart: ${titulo}`,window._dataFile.sha);
+    await freshPut("data.js",utf8ToBase64(lines.join("\n")),`Edita fanart: ${titulo}`);
     await loadGalleryManage();
   }catch(e){ alert("Error al guardar: "+e.message); }
 }
@@ -741,7 +747,7 @@ async function deleteImage(lineIndex){
   if(!confirm(`¿Eliminar "${item.titulo}"? Esto la quita de la galería y borra el archivo de imagen.`)) return;
   try{
     const lines=window._dataLines.slice(); lines.splice(lineIndex,1);
-    await putFile("data.js",utf8ToBase64(lines.join("\n")),`Elimina fanart: ${item.titulo}`,window._dataFile.sha);
+    await freshPut("data.js",utf8ToBase64(lines.join("\n")),`Elimina fanart: ${item.titulo}`);
     try{ const imgFile=await getFile(item.src); await deleteFile(item.src,`Elimina archivo de imagen: ${item.titulo}`,imgFile.sha); }catch(e){}
     await loadGalleryManage();
   }catch(e){ alert("Error al eliminar: "+e.message); }
@@ -800,7 +806,7 @@ async function deleteSong(lineIndex){
   if(!confirm(`¿Eliminar la canción "${song.titulo}"?`)) return;
   try{
     const lines=window._dataLines.slice(); lines.splice(lineIndex,1);
-    await putFile("data.js",utf8ToBase64(lines.join("\n")),`Elimina canción: ${song.titulo}`,window._dataFile.sha);
+    await freshPut("data.js",utf8ToBase64(lines.join("\n")),`Elimina canción: ${song.titulo}`);
     await loadMusicManage();
   }catch(e){ alert("Error al eliminar: "+e.message); }
 }
@@ -819,7 +825,7 @@ async function addSong(){
     if(idx===-1) throw new Error("No se encontró el array CANCIONES.");
     const newLine=`  { titulo:"${esc(titulo)}", youtubeId:"${youtubeId}" },\n`;
     const newContent=content.slice(0,idx+marker.length)+newLine+content.slice(idx+marker.length);
-    await putFile("data.js",utf8ToBase64(newContent),`Agrega canción: ${titulo}`,file.sha);
+    await freshPut("data.js",utf8ToBase64(newContent),`Agrega canción: ${titulo}`);
     document.getElementById("song-titulo").value="";
     document.getElementById("song-url").value="";
     await loadMusicManage();
@@ -880,7 +886,7 @@ async function deleteSound(lineIndex){
   if(!confirm(`¿Eliminar el sonido "${sound.nombre}"? (el archivo de audio seguirá en el repositorio, solo se quita de la lista)`)) return;
   try{
     const lines=window._dataLines.slice(); lines.splice(lineIndex,1);
-    await putFile("data.js",utf8ToBase64(lines.join("\n")),`Elimina sonido: ${sound.nombre}`,window._dataFile.sha);
+    await freshPut("data.js",utf8ToBase64(lines.join("\n")),`Elimina sonido: ${sound.nombre}`);
     await loadSoundsManage();
   }catch(e){ alert("Error al eliminar: "+e.message); }
 }
@@ -911,7 +917,7 @@ async function addSound(){
     if(idx===-1) throw new Error("No se encontró el array SONIDOS.");
     const newLine=`  { tipo:"${tipo}", nombre:"${esc(nombre)}", archivo:"${soundPath}", peso:${peso} },\n`;
     const newContent=content.slice(0,idx+marker.length)+newLine+content.slice(idx+marker.length);
-    await putFile("data.js",utf8ToBase64(newContent),`Agrega sonido: ${nombre}`,idxFile.sha);
+    await freshPut("data.js",utf8ToBase64(newContent),`Agrega sonido: ${nombre}`);
 
     document.getElementById("sound-nombre").value="";
     document.getElementById("sound-peso").value="1";
@@ -967,7 +973,7 @@ async function deletePhrase(lineIndex){
   if(!confirm(`¿Eliminar la frase "${phrase.texto}"?`)) return;
   try{
     const lines=window._dataLines.slice(); lines.splice(lineIndex,1);
-    await putFile("data.js",utf8ToBase64(lines.join("\n")),`Elimina frase de la chibi`,window._dataFile.sha);
+    await freshPut("data.js",utf8ToBase64(lines.join("\n")),`Elimina frase de la chibi`);
     await loadPhrasesManage();
   }catch(e){ alert("Error al eliminar: "+e.message); }
 }
@@ -985,7 +991,7 @@ async function addPhrase(){
     if(idx===-1) throw new Error("No se encontró el array CHIBI_FRASES.");
     const newLine=`  { texto:"${esc(texto)}", peso:${peso} },\n`;
     const newContent=content.slice(0,idx+marker.length)+newLine+content.slice(idx+marker.length);
-    await putFile("data.js",utf8ToBase64(newContent),`Agrega frase de la chibi`,file.sha);
+    await freshPut("data.js",utf8ToBase64(newContent),`Agrega frase de la chibi`);
     document.getElementById("phrase-texto").value="";
     document.getElementById("phrase-peso").value="1";
     await loadPhrasesManage();
@@ -1039,7 +1045,7 @@ async function deleteSheepIcon(lineIndex){
   if(!confirm(`¿Quitar el icono "${icon.path.split("/").pop()}" de la lista?`)) return;
   try{
     const lines=window._dataLines.slice(); lines.splice(lineIndex,1);
-    await putFile("data.js",utf8ToBase64(lines.join("\n")),`Quita icono oveja: ${icon.path}`,window._dataFile.sha);
+    await freshPut("data.js",utf8ToBase64(lines.join("\n")),`Quita icono oveja: ${icon.path}`);
     await loadSheepIcons();
   }catch(e){ alert("Error: "+e.message); }
 }
@@ -1067,7 +1073,7 @@ async function addSheepIcon(){
     if(idx===-1) throw new Error("No se encontró el array OVEJA_IMGS.");
     const newLine=`  "${iconPath}",\n`;
     const newContent=content.slice(0,idx+marker.length)+newLine+content.slice(idx+marker.length);
-    await putFile("data.js",utf8ToBase64(newContent),`Agrega icono oveja: ${cleanName}`,idxFile.sha);
+    await freshPut("data.js",utf8ToBase64(newContent),`Agrega icono oveja: ${cleanName}`);
     fileInput.value="";
     await loadSheepIcons();
   }catch(e){ alert("Error al subir: "+e.message); }
@@ -1117,7 +1123,7 @@ async function saveLore(){
     const file=await getFile("data.js");
     const content=base64ToUtf8(file.content);
     const newContent=content.replace(/quien:\s*"(?:\\.|[^"\\])*"/, `quien: "${esc(quien)}"`);
-    await putFile("data.js",utf8ToBase64(newContent),"Edita lore: bio",file.sha);
+    await freshPut("data.js",utf8ToBase64(newContent),"Edita lore: bio");
     document.getElementById("lore-log").textContent="✓ Bio guardada.";
     setTimeout(()=>document.getElementById("lore-log").textContent="",3000);
   }catch(e){ alert("Error: "+e.message); }
@@ -1135,7 +1141,7 @@ async function deleteMeta(idx){
     // simpler: replace the raw meta entry
     const escaped=meta.raw.replace(/[.*+?^${}()|[\]\\]/g,'\\$&');
     const cleaned=content.replace(new RegExp(',?\\s*'+escaped),'');
-    await putFile("data.js",utf8ToBase64(cleaned),"Elimina meta de lore",file.sha);
+    await freshPut("data.js",utf8ToBase64(cleaned),"Elimina meta de lore");
     await loadLore();
   }catch(e){ alert("Error: "+e.message); }
 }
@@ -1153,7 +1159,7 @@ async function addMeta(){
     if(idx===-1) throw new Error("No se encontró el array metas.");
     const newLine=`    { ico:"${esc(ico)}", txt:"${esc(txt)}" },\n`;
     const newContent=content.slice(0,idx+marker.length)+newLine+content.slice(idx+marker.length);
-    await putFile("data.js",utf8ToBase64(newContent),"Agrega meta de lore",file.sha);
+    await freshPut("data.js",utf8ToBase64(newContent),"Agrega meta de lore");
     document.getElementById("meta-ico").value="";
     document.getElementById("meta-txt").value="";
     await loadLore();
@@ -1210,7 +1216,7 @@ async function deleteGame(lineIndex){
   if(!confirm(`¿Eliminar el juego "${game.titulo}"?`)) return;
   try{
     const lines=window._dataLines.slice(); lines.splice(lineIndex,1);
-    await putFile("data.js",utf8ToBase64(lines.join("\n")),`Elimina juego: ${game.titulo}`,window._dataFile.sha);
+    await freshPut("data.js",utf8ToBase64(lines.join("\n")),`Elimina juego: ${game.titulo}`);
     await loadGamesManage();
   }catch(e){ alert("Error al eliminar: "+e.message); }
 }
@@ -1244,7 +1250,7 @@ async function addGame(){
     if(idx===-1) throw new Error("No se encontró el array JUEGOS.");
     const newLine=`  { titulo:"${esc(titulo)}", nota:${nota}, rec:"${rec}", nota_texto:"${esc(nota_texto)}"${imagenPath?`, imagen:"${imagenPath}"`:"" } },\n`;
     const newContent=content.slice(0,idx+marker.length)+newLine+content.slice(idx+marker.length);
-    await putFile("data.js",utf8ToBase64(newContent),`Agrega juego: ${titulo}`,file.sha);
+    await freshPut("data.js",utf8ToBase64(newContent),`Agrega juego: ${titulo}`);
     document.getElementById("game-titulo").value="";
     document.getElementById("game-nota-texto").value="";
     document.getElementById("game-nota").value="3";
@@ -1309,7 +1315,7 @@ async function publish(){
     const idx=content.indexOf(marker);
     if(idx===-1) throw new Error("No se encontró el array IMAGENES en data.js — revisa que el archivo esté bien.");
     const newContent=content.slice(0,idx+marker.length)+newEntry+content.slice(idx+marker.length);
-    await putFile("data.js",utf8ToBase64(newContent),`Agrega fanart: ${titulo}`,file.sha);
+    await freshPut("data.js",utf8ToBase64(newContent),`Agrega fanart: ${titulo}`);
     logLine("✓ Galería actualizada.","ok");
     logLine("🎉 ¡Listo! Tu web pública se actualizará en 1-2 minutos.","ok");
 
