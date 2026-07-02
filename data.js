@@ -50,7 +50,6 @@ const SONIDOS = [
   { tipo:"chibi", nombre:"Oveja chillona", archivo:"sonidos/1782963234121-ovejita-chillona.mp3", peso:1 },
   { tipo:"campana", nombre:"Oveja chikita", archivo:"sonidos/1782963214718-ovejita-chikita.mp3", peso:1 },
   { tipo:"campana", nombre:"Campanita", archivo:"sonidos/1782963194908-campanita1.mp3", peso:1 },
-  { tipo:"chibi",   nombre:"Oveja grande",  archivo:"sonidos/monsheep.mp3",    peso:1 },
 ];
 
 /* ============================
