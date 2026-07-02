@@ -90,6 +90,7 @@ const OVEJA_IMGS = [
    imagen: ruta de la portada (opcional)
    ============================ */
 const JUEGOS = [
+  { titulo:"Minecraft", nota:5, rec:"si", nota_texto:"Juegazo", imagen:"imagenes/juegos/1782983861358-homepage-discover-our-games-mc-vanilla-keyart-864x864.jpg" },
   /* ejemplo — borra esta línea y agrega tus juegos:
   { titulo:"Nombre del juego", nota:4, rec:"si", nota_texto:"Muy divertido 💜", imagen:"imagenes/juegos/juego.webp" },
   */
