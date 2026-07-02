@@ -68,6 +68,7 @@ const CHIBI_FRASES = [
    🖼️ IMÁGENES / FANARTS
    ============================ */
 const IMAGENES = [
+      { src:"imagenes/1782983815322-1c67dd61-4a0f-4c1f-b117-6a99bb2b8172.webp", titulo:"san gowi", artista:"coso", categoria:"fanart", fecha:"2026-07-02", placeholder:"🎨", nota:"aaaa", destacado:true },
       { src:"imagenes/1782983784981-ae858789-ad9c-442d-96a4-5479403fcf2a.webp", titulo:"coso", artista:"coso", categoria:"fanart", fecha:"2026-07-02", placeholder:"🎨", nota:"no se que poner", destacado:false },
       { src:"imagenes/1782983755963-ba7f692b-b4b5-429b-b839-efafa3052f1f-1-.webp", titulo:"Vitral coso", artista:"coso", categoria:"fanart", fecha:"2026-07-02", placeholder:"🎨", nota:"con la yepita", destacado:true },
       { src:"imagenes/1782983719068-proyecto-gowi-1.webp", titulo:"Uno de mis primeros fanarts", artista:"Chibi", categoria:"fanart", fecha:"2026-07-02", placeholder:"🎨", nota:"Fue uno de los primeros fan art que me hicieron", destacado:true },
