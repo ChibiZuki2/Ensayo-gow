@@ -67,6 +67,7 @@ const CHIBI_FRASES = [
    🖼️ IMÁGENES / FANARTS
    ============================ */
 const IMAGENES = [
+      { src:"imagenes/1782962928224-ba7f692b-b4b5-429b-b839-efafa3052f1f-1-.webp", titulo:"Vitral coso", artista:"coso", categoria:"fanart", fecha:"2026-07-02", placeholder:"🎨", nota:"probando", destacado:false },
       { src:"imagenes/1782962583054-ae858789-ad9c-442d-96a4-5479403fcf2a.webp", titulo:"Probando 1", artista:"coso", categoria:"fanart", fecha:"2026-07-02", placeholder:"🎨", nota:"", destacado:true },
       { src:"imagenes/1782962260537-proyecto-gowi-1.webp", titulo:"Uno de mis primeros fanarts", artista:"Chibi", categoria:"fanart", fecha:"2026-07-02", placeholder:"🎨", nota:"Uno de mis primeros fanarts a mi", destacado:false },
   { src:"imagenes/ejemplo02.jpg", titulo:"Ejemplo emote",     artista:"@emoteartist", categoria:"emotes", fecha:"2026-05-10", placeholder:"✨", nota:"", destacado:false },
