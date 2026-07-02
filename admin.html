@@ -621,6 +621,15 @@ const putFile=(path,content,message,sha)=>ghRequest(`/repos/${cfg.owner}/${cfg.r
 
 /* Siempre obtiene el SHA fresco antes de escribir — evita el error 409 */
 async function freshPut(path, content, message){
+  /* Si es data.js, valida la sintaxis JS antes de guardar */
+  if(path==="data.js"){
+    try{
+      const decoded = base64ToUtf8(content);
+      new Function(decoded); // lanza error si hay sintaxis incorrecta
+    }catch(e){
+      throw new Error(`❌ El archivo data.js quedaría con un error de sintaxis y no se guardó.\nDetalle: ${e.message}\n\nRevisa los datos que intentas guardar (caracteres especiales, comillas, etc.)`);
+    }
+  }
   const current = await getFile(path);
   return putFile(path, content, message, current.sha);
 }
