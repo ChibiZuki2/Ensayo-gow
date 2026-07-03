@@ -67,6 +67,7 @@ const CHIBI_FRASES = [
    🖼️ IMÁGENES / FANARTS
    ============================ */
 const IMAGENES = [
+      { src:"imagenes/1783109613612-proyecto-gowi-1.webp", titulo:"coso1", artista:"coso", categoria:"fanart", fecha:"2026-07-03", placeholder:"🎨", nota:"coso", destacado:false },
   { src:"imagenes/ejemplo01.jpg", titulo:"Ejemplo fanart 1",  artista:"@artista",     categoria:"fanart", fecha:"2026-05-01", placeholder:"🎨", nota:"", destacado:false },
   { src:"imagenes/ejemplo02.jpg", titulo:"Ejemplo emote",     artista:"@emoteartist", categoria:"emotes", fecha:"2026-05-10", placeholder:"✨", nota:"", destacado:false },
   { src:"imagenes/ejemplo03.jpg", titulo:"Ejemplo meme",      artista:"@mememaster",  categoria:"memes",  fecha:"2026-05-20", placeholder:"😂", nota:"", destacado:false },
