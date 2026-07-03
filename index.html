@@ -639,7 +639,11 @@ input[type=range].mp-vol::-webkit-slider-thumb{-webkit-appearance:none;width:10p
     <div class="games-view-toggle">
       <button class="view-btn active" id="gview-lista" onclick="switchGameView('lista')">📋 Lista</button>
       <button class="view-btn" id="gview-collage" onclick="switchGameView('collage')">⊞ Ver todos</button>
-      <button class="view-btn" id="gview-sort" onclick="toggleGamesSort()" title="Ordenar por nota">🐑 Ordenar</button>
+      <select class="view-btn" id="gview-sort" onchange="setGamesSort(this.value)" style="cursor:pointer;padding-right:8px">
+        <option value="default">🐑 Sin ordenar</option>
+        <option value="desc">🐑 Mayor nota primero</option>
+        <option value="asc">🐑 Menor nota primero</option>
+      </select>
     </div>
 
     <!-- Vista: Lista -->
@@ -792,10 +796,84 @@ input[type=range].mp-vol::-webkit-slider-thumb{-webkit-appearance:none;width:10p
 </div>
 <button id="music-fab" onclick="showPlayer()" title="Abrir reproductor">🎵</button>
 
-<script src="data.js"></script>
+<script src="data.js" onerror="window._dataJsError=true"></script>
+<script>
+/* ==== PROTECCIÓN: si data.js no cargó o tiene error, usar datos vacíos ==== */
+if(typeof IMAGENES==="undefined"){ window.IMAGENES=[]; }
+if(typeof CANCIONES==="undefined"){ window.CANCIONES=[]; }
+if(typeof SONIDOS==="undefined"){ window.SONIDOS=[]; }
+if(typeof CHIBI_FRASES==="undefined"){ window.CHIBI_FRASES=[{texto:"¡Hola! 💜",peso:1}]; }
+if(typeof CHIBI_EGG==="undefined"){ window.CHIBI_EGG="✨ Eres mi persona favorita!! 🤫💜✨"; }
+if(typeof OVEJA_IMGS==="undefined"){ window.OVEJA_IMGS=[]; }
+if(typeof JUEGOS==="undefined"){ window.JUEGOS=[]; }
+if(typeof LORE==="undefined"){ window.LORE={quien:"",metas:[]}; }
+if(typeof CATEGORIES==="undefined"){ window.CATEGORIES=["fanart","emotes","memes"]; }
+if(typeof BDAY_MONTH==="undefined"){ window.BDAY_MONTH=7; }
+if(typeof BDAY_DAY==="undefined"){ window.BDAY_DAY=9; }
+if(typeof TWITCH_CHANNEL==="undefined"){ window.TWITCH_CHANNEL=""; }
+if(window._dataJsError){
+  console.error("⚠️ data.js no se pudo cargar — la galería estará vacía hasta que se corrija.");
+}
+</script>
 <script>
 /* ==== CUMPLEAÑOS / CUENTA REGRESIVA ==== */
 const REC_LABEL = { si:"✅ Recomienda", no:"❌ No recomienda", tal:"🤔 Tal vez" };
+
+/* bubbleTimer declarado aquí para que showGreeting lo pueda usar */
+let bubbleTimer = null;
+
+/* ==== LORE ==== */
+function renderLore(){
+  const quienEl=document.getElementById("lore-quien");
+  if(quienEl && typeof LORE!=="undefined") quienEl.textContent=LORE.quien||"";
+  const metasEl=document.getElementById("lore-metas");
+  if(metasEl && typeof LORE!=="undefined" && LORE.metas){
+    metasEl.innerHTML=LORE.metas.map(m=>`<div class="meta-item"><div class="meta-ico">${m.ico}</div><div class="meta-txt">${m.txt}</div></div>`).join("");
+  }
+}
+
+/* ==== SALUDO SEGÚN HORA DEL DÍA — sale de la chibi ==== */
+(function showGreeting(){
+  const h=new Date().getHours();
+  let main="", sub="";
+  if(h>=6&&h<12){  main="¡Buenos días, mi corderito! ☀️"; sub="Que tengas un día lleno de magia 💜"; }
+  else if(h>=12&&h<19){ main="¡Buenas tardes, mi corderito! 🌤️"; sub="Qué bueno tenerte por aquí 💜"; }
+  else if(h>=19&&h<24){ main="¡Buenas noches, mi corderito! 🌙"; sub="Gracias por pasarte a visitar 💜"; }
+  else{ main="¡Hola, mi corderito trasnochador! 🌌"; sub="Que descanses bien después 💜"; }
+  setTimeout(()=>{
+    const bubble=document.getElementById("chibi-bubble");
+    if(!bubble) return;
+    bubble.innerHTML=`<span style="font-weight:600">${main}</span><br><span style="font-size:11px;opacity:.8">${sub}</span>`;
+    bubble.classList.add("show");
+    clearTimeout(bubbleTimer);
+    bubbleTimer=setTimeout(()=>bubble.classList.remove("show"), 5000);
+  }, 900);
+})();
+
+/* ==== CHIBI IDLE — aparece si llevas 10 min sin interactuar ==== */
+let _idleTimer=null;
+const IDLE_MSG=["¡Oye! ¿Sigues ahí? 👀","Psst… no te duermas 🐑","Sigo aquí esperándote 💜","¿Buscando algo en especial? ✨"];
+function resetIdleTimer(){
+  clearTimeout(_idleTimer);
+  const bubble=document.getElementById("idle-bubble");
+  if(bubble) bubble.classList.remove("show");
+  _idleTimer=setTimeout(()=>{
+    const chibiEl=document.getElementById("chibi-img");
+    const bubble=document.getElementById("idle-bubble");
+    if(!chibiEl||!bubble) return;
+    const rect=chibiEl.getBoundingClientRect();
+    bubble.style.top=(rect.top+window.scrollY-60)+"px";
+    bubble.style.left=(rect.left+rect.width/2-100)+"px";
+    document.getElementById("idle-bubble-text").textContent=IDLE_MSG[Math.floor(Math.random()*IDLE_MSG.length)];
+    bubble.classList.add("show");
+    setTimeout(()=>bubble.classList.remove("show"),5000);
+  }, 10*60*1000);
+}
+["click","mousemove","keydown","scroll","touchstart"].forEach(ev=>document.addEventListener(ev,resetIdleTimer,{passive:true}));
+resetIdleTimer();
+
+/* ==== LORE: renderizar al inicio ==== */
+window.addEventListener("DOMContentLoaded", renderLore);
 
 let currentGamesSearch="", gamesSort="default";
 function onGamesSearch(){
@@ -808,11 +886,8 @@ function clearGamesSearch(){
   document.getElementById("games-search-info").textContent="";
   renderGames();
 }
-function toggleGamesSort(){
-  gamesSort = gamesSort==="default" ? "desc" : gamesSort==="desc" ? "asc" : "default";
-  const labels={"default":"🐑 Ordenar","desc":"🐑 Mayor nota","asc":"🐑 Menor nota"};
-  document.getElementById("gview-sort").textContent=labels[gamesSort];
-  document.getElementById("gview-sort").classList.toggle("active", gamesSort!=="default");
+function setGamesSort(val){
+  gamesSort=val;
   renderGames();
 }
 
@@ -971,8 +1046,6 @@ function titleClick(){
   setTimeout(()=>{ bell.classList.remove("ring"); title.classList.remove("shine"); }, 800);
 }
 
-let bubbleTimer = null;
-
 function chibiClick() {
   playRandomSheep();
   const bubble = document.getElementById("chibi-bubble");
@@ -1014,15 +1087,17 @@ setupObserver();
 
 function renderGallery(){
   renderFeatured();
-  let imgs=[...IMAGENES];
-  if(currentCat!=="all") imgs=imgs.filter(i=>i.categoria===currentCat);
+  const imgs_all = Array.isArray(IMAGENES) ? [...IMAGENES] : [];
+  let imgs = imgs_all.filter(i=>currentCat==="all"||i.categoria===currentCat);
   if(currentSearch) imgs=imgs.filter(i=>
-    i.titulo.toLowerCase().includes(currentSearch) ||
-    i.artista.toLowerCase().includes(currentSearch)
+    (i.titulo||"").toLowerCase().includes(currentSearch)||
+    (i.artista||"").toLowerCase().includes(currentSearch)
   );
   imgs.sort((a,b)=>currentSort==="new"?new Date(b.fecha)-new Date(a.fecha):new Date(a.fecha)-new Date(b.fecha));
   const info=document.getElementById("fanart-search-info");
-  if(info) info.textContent = currentSearch ? `${imgs.length} resultado${imgs.length!==1?"s":""} para "${currentSearch}"` : "";
+  if(info) info.textContent=currentSearch?`${imgs.length} resultado${imgs.length!==1?"s":""} para "${currentSearch}"`:"";
+  try{ document.getElementById("count").textContent=imgs_all.length; }catch(e){}
+  try{ document.getElementById("artist-count").textContent=new Set(imgs_all.map(i=>i.artista)).size; }catch(e){}
   const masonry=document.getElementById("masonry"), empty=document.getElementById("empty");
   masonry.innerHTML="";
   setupObserver();
@@ -1049,13 +1124,11 @@ function renderGallery(){
     masonry.appendChild(card);
     cardObserver.observe(card);
   });
-  document.getElementById("count").textContent=imgs.length;
-  document.getElementById("artist-count").textContent=new Set(IMAGENES.map(i=>i.artista)).size;
 }
 
 function renderFeatured(){
   const wrap=document.getElementById("featured-wrap"), track=document.getElementById("featured-track");
-  const dest=IMAGENES.filter(i=>i.destacado);
+  const dest=(Array.isArray(IMAGENES)?IMAGENES:[]).filter(i=>i.destacado);
   if(!dest.length){ wrap.classList.remove("show"); track.innerHTML=""; return; }
   wrap.classList.add("show"); track.innerHTML="";
   dest.forEach(img=>{
@@ -1077,7 +1150,7 @@ function setSort(s){
   renderGallery();
 }
 function surpriseMe(){
-  if(!IMAGENES.length) return;
+  if(!Array.isArray(IMAGENES)||!IMAGENES.length) return;
   const img=IMAGENES[Math.floor(Math.random()*IMAGENES.length)];
 
   const flash=document.getElementById("surprise-flash");
