@@ -45,10 +45,9 @@ const CANCIONES = [
    peso: número — más alto = sale más seguido
    ============================ */
 const SONIDOS = [
-  { tipo:"campana", nombre:"Campanita1", archivo:"sonidos/1782982840916-campanita1.mp3", peso:1 },
-  { tipo:"chibi", nombre:"Oveja seria", archivo:"sonidos/1782982822773-ovejita-seria.mp3", peso:1 },
-  { tipo:"chibi", nombre:"Oveja chillona", archivo:"sonidos/1782982809512-ovejita-chillona.mp3", peso:1 },
-  { tipo:"chibi", nombre:"Oveja chikita", archivo:"sonidos/1782982727634-ovejita-chikita.mp3", peso:1 },
+  { tipo:"chibi",   nombre:"Oveja pequeña", archivo:"sonidos/small-sheep.mp3", peso:1 },
+  { tipo:"chibi",   nombre:"Oveja grande",  archivo:"sonidos/monsheep.mp3",    peso:1 },
+  { tipo:"campana", nombre:"Campanas",      archivo:"sonidos/sheep-bells.mp3", peso:1 },
 ];
 
 /* ============================
@@ -68,20 +67,19 @@ const CHIBI_FRASES = [
    🖼️ IMÁGENES / FANARTS
    ============================ */
 const IMAGENES = [
-      { src:"imagenes/1782983815322-1c67dd61-4a0f-4c1f-b117-6a99bb2b8172.webp", titulo:"san gowi", artista:"coso", categoria:"fanart", fecha:"2026-07-02", placeholder:"🎨", nota:"aaaa", destacado:true },
-      { src:"imagenes/1782983784981-ae858789-ad9c-442d-96a4-5479403fcf2a.webp", titulo:"coso", artista:"coso", categoria:"fanart", fecha:"2026-07-02", placeholder:"🎨", nota:"no se que poner", destacado:false },
-      { src:"imagenes/1782983755963-ba7f692b-b4b5-429b-b839-efafa3052f1f-1-.webp", titulo:"Vitral coso", artista:"coso", categoria:"fanart", fecha:"2026-07-02", placeholder:"🎨", nota:"con la yepita", destacado:true },
-      { src:"imagenes/1782983719068-proyecto-gowi-1.webp", titulo:"Uno de mis primeros fanarts", artista:"Chibi", categoria:"fanart", fecha:"2026-07-02", placeholder:"🎨", nota:"Fue uno de los primeros fan art que me hicieron", destacado:true },
+  { src:"imagenes/ejemplo01.jpg", titulo:"Ejemplo fanart 1",  artista:"@artista",     categoria:"fanart", fecha:"2026-05-01", placeholder:"🎨", nota:"", destacado:false },
+  { src:"imagenes/ejemplo02.jpg", titulo:"Ejemplo emote",     artista:"@emoteartist", categoria:"emotes", fecha:"2026-05-10", placeholder:"✨", nota:"", destacado:false },
+  { src:"imagenes/ejemplo03.jpg", titulo:"Ejemplo meme",      artista:"@mememaster",  categoria:"memes",  fecha:"2026-05-20", placeholder:"😂", nota:"", destacado:false },
 ];
 
 /* ============================
    🎮 ICONOS DE OVEJA (calificaciones de juegos)
    ============================ */
 const OVEJA_IMGS = [
-  "imagenes/ovejas/1782984336582-oveja3.png",
-  "imagenes/ovejas/1782984318264-oveja4.png",
-  "imagenes/ovejas/1782984130308-oveja1.png",
-  "imagenes/ovejas/1782984106709-oveja2.png",
+  "imagenes/ovejas/oveja1.png",
+  "imagenes/ovejas/oveja2.png",
+  "imagenes/ovejas/oveja3.png",
+  "imagenes/ovejas/oveja4.png",
 ];
 
 /* ============================
@@ -90,7 +88,6 @@ const OVEJA_IMGS = [
    imagen: ruta de la portada (opcional)
    ============================ */
 const JUEGOS = [
-  { titulo:"Minecraft", nota:5, rec:"si", nota_texto:"Juegazo", imagen:"imagenes/juegos/1782983861358-homepage-discover-our-games-mc-vanilla-keyart-864x864.jpg" },
   /* ejemplo — borra esta línea y agrega tus juegos:
   { titulo:"Nombre del juego", nota:4, rec:"si", nota_texto:"Muy divertido 💜", imagen:"imagenes/juegos/juego.webp" },
   */
