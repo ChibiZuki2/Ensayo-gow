@@ -49,7 +49,6 @@ const SONIDOS = [
   { tipo:"chibi", nombre:"Oveja seria", archivo:"sonidos/1783110049122-ovejita-seria.mp3", peso:1 },
   { tipo:"chibi", nombre:"Oveja chillona", archivo:"sonidos/1783110036092-ovejita-chillona.mp3", peso:1 },
   { tipo:"chibi", nombre:"Oveja chikita", archivo:"sonidos/1783110024397-ovejita-chikita.mp3", peso:1 },
-  { tipo:"chibi",   nombre:"Oveja grande",  archivo:"sonidos/monsheep.mp3",    peso:1 },
 ];
 
 /* ============================
