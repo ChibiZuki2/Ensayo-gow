@@ -17,20 +17,41 @@ body{background:var(--bg);color:var(--text);font-family:'Inter',sans-serif;trans
 /* ===== NAVEGACIÓN POR PESTAÑAS (píldoras) ===== */
 .nav-tabs-wrap{position:relative;z-index:5;display:flex;justify-content:center;padding:.9rem 1rem .5rem;margin-top:-4px}
 .nav-tabs{display:flex;gap:6px;background:rgba(255,255,255,.06);border:.5px solid rgba(201,168,232,.15);padding:5px;border-radius:40px;backdrop-filter:blur(8px)}
-.nav-tab{padding:8px 22px;font-size:12.5px;font-family:'Inter',sans-serif;font-weight:500;letter-spacing:.06em;color:var(--text2);cursor:pointer;border-radius:30px;border:none;background:transparent;transition:background .22s,color .22s,transform .18s,box-shadow .22s;white-space:nowrap;position:relative;overflow:hidden}
+.nav-tab{padding:8px 22px;font-size:12.5px;font-family:'Inter',sans-serif;font-weight:500;letter-spacing:.06em;color:var(--text2);cursor:pointer;border-radius:30px;border:none;background:transparent;transition:background .22s,color .22s,transform .18s,box-shadow .22s;white-space:nowrap;position:relative;overflow:hidden;display:flex;align-items:center;gap:6px}
+.nav-tab .tab-ico{display:inline-block;transition:transform .3s}
 .nav-tab::before{content:'';position:absolute;inset:0;border-radius:30px;background:radial-gradient(circle at 50% 0%,rgba(201,168,232,.25),transparent 70%);opacity:0;transition:opacity .2s}
 .nav-tab:hover{color:var(--text);transform:translateY(-1px)}
 .nav-tab:hover::before{opacity:1}
 .nav-tab:active{transform:scale(.96)}
 .nav-tab.active{background:linear-gradient(135deg,rgba(168,85,247,.28),rgba(123,94,167,.2));color:var(--text);box-shadow:0 0 0 1px rgba(168,85,247,.45),0 4px 16px rgba(123,94,167,.25);text-shadow:0 0 12px rgba(201,168,232,.5)}
 .nav-tab.active::before{opacity:1}
+.nav-tab.active .tab-ico{animation:tabIcoActive .5s ease both}
+@keyframes tabIcoActive{0%{transform:scale(1) rotate(0deg)}30%{transform:scale(1.4) rotate(-15deg)}60%{transform:scale(.9) rotate(8deg)}100%{transform:scale(1.15) rotate(0deg)}}
 
 /* ===== SECCIONES ===== */
 .page-section{display:none;animation:sectionIn .35s ease both}
 .page-section.active{display:block}
 @keyframes sectionIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
 
-/* ===== FONDO GRADIENTE ANIMADO (57) ===== */
+/* ===== SPLASH SCREEN (3) ===== */
+#splash{position:fixed;inset:0;z-index:9999;background:#0f0917;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px;pointer-events:none}
+#splash.hide{animation:splashOut .7s ease forwards}
+@keyframes splashOut{to{opacity:0;transform:scale(1.04)}}
+.splash-bell{font-size:52px;animation:splashBell .8s ease .2s both}
+@keyframes splashBell{from{opacity:0;transform:scale(.4) rotate(-20deg)}to{opacity:1;transform:scale(1) rotate(0)}}
+.splash-title{font-family:'Cinzel',serif;font-size:clamp(32px,8vw,60px);font-weight:700;letter-spacing:.14em;animation:splashTitle .9s ease .5s both}
+@keyframes splashTitle{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:none}}
+.splash-title .s-lady{color:#E8DEFF}.splash-title .s-gowi{color:#A855F7}
+.splash-sub{font-size:12px;letter-spacing:.2em;color:rgba(201,168,232,.5);animation:splashTitle .9s ease .75s both}
+
+/* ===== HUELLA DE OVEJA AL CLICK (2) ===== */
+.sheep-print{position:fixed;pointer-events:none;font-size:18px;z-index:9998;animation:sheepPrint .8s ease forwards;transform-origin:center}
+@keyframes sheepPrint{0%{opacity:1;transform:scale(.3) rotate(var(--r))}40%{opacity:1;transform:scale(1.1) rotate(var(--r))}100%{opacity:0;transform:scale(.8) translateY(-30px) rotate(var(--r))}}
+
+/* ===== SCROLLING SONG TITLE (26) ===== */
+.mp-title{font-size:13px;font-weight:500;color:var(--text);white-space:nowrap;overflow:hidden;max-width:200px}
+.mp-title.scrolling{animation:titleScroll 8s linear infinite}
+@keyframes titleScroll{0%,15%{transform:translateX(0)}85%,100%{transform:translateX(calc(-100% + 180px))}}
 body::before{content:'';position:fixed;inset:0;z-index:-1;background:linear-gradient(235deg,#0f0917,#1a0d2e,#120820,#0d0619,#1e1035,#0f0917);background-size:400% 400%;animation:bgShift 22s ease infinite;pointer-events:none}
 @keyframes bgShift{0%{background-position:0% 50%}50%{background-position:100% 50%}100%{background-position:0% 50%}}
 
@@ -373,7 +394,9 @@ body::before{content:'';position:fixed;inset:0;z-index:-1;background:linear-grad
 @media(max-width:380px){.masonry{column-count:1}}
 .card{break-inside:avoid;margin-bottom:10px;border-radius:14px;overflow:hidden;border:.5px solid var(--border-c);background:var(--card);transition:transform .25s,border-color .25s,box-shadow .25s,opacity .5s;cursor:pointer;position:relative;opacity:0;transform:translateY(16px)}
 .card.visible{opacity:1;transform:translateY(0)}
-.card-note-badge{position:absolute;top:8px;right:8px;z-index:2;width:24px;height:24px;border-radius:50%;background:rgba(15,9,26,.65);backdrop-filter:blur(4px);display:flex;align-items:center;justify-content:center;font-size:12px}
+.card-note-badge{position:absolute;top:8px;right:8px;z-index:2;width:30px;height:30px;border-radius:50%;background:rgba(15,9,26,.65);backdrop-filter:blur(4px);display:flex;align-items:center;justify-content:center;padding:3px;transition:transform .2s}
+.card-note-badge:hover{transform:scale(1.15)}
+.card-note-badge img{width:100%;height:100%;object-fit:contain;filter:drop-shadow(0 0 4px rgba(201,168,232,.6))}
 .card:hover{transform:translateY(-5px);border-color:var(--accent);box-shadow:0 8px 24px var(--glow)}
 .card img{width:100%;display:block}
 .card-placeholder{width:100%;display:flex;align-items:center;justify-content:center;font-size:28px;background:var(--bg2)}
@@ -393,7 +416,7 @@ body::before{content:'';position:fixed;inset:0;z-index:-1;background:linear-grad
 .lightbox-info h3{font-size:15px;font-weight:500}
 .lightbox-info p{font-size:13px;color:var(--text2);margin-top:3px}
 .lb-note{display:none;max-width:480px;margin:12px auto 0;background:rgba(123,94,167,.15);border:.5px solid var(--tag-border);border-radius:14px;padding:10px 18px;font-size:12.5px;color:var(--text);line-height:1.5;font-style:italic}
-.lb-note::before{content:"💌 ";font-style:normal}
+.lb-note::before{content:"";display:inline-block;width:20px;height:20px;background:url('imagenes/ovejas/oveja1.png') center/contain no-repeat;vertical-align:middle;margin-right:6px;filter:drop-shadow(0 0 4px rgba(201,168,232,.5))}
 .lb-note.show{display:block}
 
 /* REDES SOCIALES */
@@ -449,6 +472,11 @@ input[type=range].mp-vol::-webkit-slider-thumb{-webkit-appearance:none;width:10p
 </head>
 <body id="app">
 <canvas id="star-canvas"></canvas>
+<div id="splash">
+  <div class="splash-bell">🔔</div>
+  <div class="splash-title"><span class="s-lady">Lady</span><span class="s-gowi">Gowi</span></div>
+  <div class="splash-sub">✦ Colección de arte de mi comunidad ✦</div>
+</div>
 <div id="heart-rain"></div>
 <div id="surprise-flash"></div>
 <div class="scroll-fabs">
@@ -536,10 +564,10 @@ input[type=range].mp-vol::-webkit-slider-thumb{-webkit-appearance:none;width:10p
 <!-- ===== NAVEGACIÓN POR PESTAÑAS ===== -->
 <div class="nav-tabs-wrap">
   <div class="nav-tabs">
-    <button class="nav-tab active" data-tab="fanarts" onclick="switchTab('fanarts')">🖼️ Fanarts</button>
-    <button class="nav-tab" data-tab="lore"    onclick="switchTab('lore')">📖 Lore</button>
-    <button class="nav-tab" data-tab="juegos"  onclick="switchTab('juegos')">🎮 Juegos</button>
-    <button class="nav-tab" data-tab="reglas"  onclick="switchTab('reglas')">📋 Reglas</button>
+    <button class="nav-tab active" data-tab="fanarts" onclick="switchTab('fanarts')"><span class="tab-ico">🖼️</span> Fanarts</button>
+    <button class="nav-tab" data-tab="lore"    onclick="switchTab('lore')"><span class="tab-ico">📖</span> Lore</button>
+    <button class="nav-tab" data-tab="juegos"  onclick="switchTab('juegos')"><span class="tab-ico">🎮</span> Juegos</button>
+    <button class="nav-tab" data-tab="reglas"  onclick="switchTab('reglas')"><span class="tab-ico">📋</span> Reglas</button>
   </div>
 </div>
 
@@ -832,7 +860,96 @@ function renderLore(){
   }
 }
 
-/* ==== SALUDO SEGÚN HORA DEL DÍA — sale de la chibi ==== */
+/* ==== SPLASH SCREEN (3) ==== */
+(function initSplash(){
+  const splash = document.getElementById("splash");
+  if(!splash) return;
+  setTimeout(()=>{
+    splash.classList.add("hide");
+    setTimeout(()=>{ splash.style.display="none"; splash.style.pointerEvents="none"; }, 700);
+  }, 1800);
+})();
+
+/* ==== HUELLA DE OVEJA AL HACER CLIC (2) ==== */
+const SHEEP_PRINTS = ["🐑","🐾","🐑","✨","🐑"];
+document.addEventListener("click", e=>{
+  if(e.target.closest("#splash")) return;
+  const el = document.createElement("div");
+  el.className = "sheep-print";
+  const rot = (Math.random()*60-30)+"deg";
+  el.style.setProperty("--r", rot);
+  el.style.left = (e.clientX - 12)+"px";
+  el.style.top  = (e.clientY - 12)+"px";
+  el.textContent = SHEEP_PRINTS[Math.floor(Math.random()*SHEEP_PRINTS.length)];
+  document.body.appendChild(el);
+  setTimeout(()=>el.remove(), 850);
+});
+
+/* ==== NAVEGACIÓN CON FLECHAS EN LIGHTBOX (10) ==== */
+let _lbCurrentIndex = -1;
+const _origOpenLightbox = openLightbox;
+window.openLightbox = function(img){
+  _origOpenLightbox(img);
+  const imgs = Array.isArray(IMAGENES) ? IMAGENES : [];
+  _lbCurrentIndex = imgs.indexOf(img);
+};
+document.addEventListener("keydown", e=>{
+  const lb = document.getElementById("lightbox");
+  if(!lb || !lb.classList.contains("open")) return;
+  const imgs = Array.isArray(IMAGENES) ? IMAGENES : [];
+  if(!imgs.length) return;
+  if(e.key==="ArrowRight"){
+    e.preventDefault();
+    _lbCurrentIndex = (_lbCurrentIndex+1) % imgs.length;
+    openLightbox(imgs[_lbCurrentIndex]);
+  } else if(e.key==="ArrowLeft"){
+    e.preventDefault();
+    _lbCurrentIndex = (_lbCurrentIndex-1+imgs.length) % imgs.length;
+    openLightbox(imgs[_lbCurrentIndex]);
+  } else if(e.key==="Escape"){
+    closeLightbox();
+  }
+});
+
+/* ==== SCROLLING TITLE EN REPRODUCTOR (26) ==== */
+function updateMpTitleScroll(){
+  const el = document.getElementById("mp-title");
+  if(!el) return;
+  el.classList.remove("scrolling");
+  void el.offsetWidth;
+  if(el.scrollWidth > el.offsetWidth + 10) el.classList.add("scrolling");
+}
+
+/* ==== MODAL DE NOTA (33) ==== */
+function openNoteModal(e, nota, artista){
+  e.stopPropagation();
+  let modal = document.getElementById("note-modal");
+  if(!modal){
+    modal = document.createElement("div");
+    modal.id = "note-modal";
+    modal.style.cssText="position:fixed;inset:0;z-index:300;display:flex;align-items:center;justify-content:center;padding:1rem;background:rgba(10,5,20,.6);backdrop-filter:blur(4px)";
+    modal.onclick = e=>{ if(e.target===modal) closeNoteModal(); };
+    document.body.appendChild(modal);
+  }
+  modal.innerHTML=`
+    <div style="background:var(--card);border:.5px solid rgba(201,168,232,.35);border-radius:20px;padding:1.6rem 1.8rem;max-width:400px;width:100%;animation:sectionIn .3s ease both;position:relative">
+      <button onclick="closeNoteModal()" style="position:absolute;top:10px;right:12px;background:none;border:none;color:var(--text2);font-size:18px;cursor:pointer;line-height:1">✕</button>
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:1rem">
+        <img src="imagenes/ovejas/oveja1.png" style="width:36px;height:36px;object-fit:contain;filter:drop-shadow(0 0 6px rgba(201,168,232,.5))"/>
+        <div>
+          <div style="font-size:13px;font-weight:600;color:var(--text)">Dedicatoria</div>
+          <div style="font-size:11px;color:var(--text2)">${artista}</div>
+        </div>
+      </div>
+      <div style="font-size:13px;color:var(--text2);line-height:1.8;font-style:italic;background:var(--bg2);border:.5px solid var(--border-c);border-radius:12px;padding:12px 16px">"${nota}"</div>
+      <div style="text-align:right;margin-top:.8rem"><span style="font-size:11px;color:var(--accent-light)">💜 con amor</span></div>
+    </div>`;
+  modal.style.display="flex";
+}
+function closeNoteModal(){
+  const m=document.getElementById("note-modal");
+  if(m) m.style.display="none";
+}
 (function showGreeting(){
   const h=new Date().getHours();
   let main="", sub="";
@@ -964,7 +1081,11 @@ function switchTab(tab){
   const section = document.getElementById("tab-"+tab);
   const btn = document.querySelector(`.nav-tab[data-tab="${tab}"]`);
   if(section) section.classList.add("active");
-  if(btn) btn.classList.add("active");
+  if(btn){
+    btn.classList.add("active");
+    const ico = btn.querySelector(".tab-ico");
+    if(ico){ ico.style.animation="none"; void ico.offsetWidth; ico.style.animation=""; }
+  }
   if(tab==="juegos") renderGames();
   if(tab==="lore") renderLore();
   setTimeout(()=>window.dispatchEvent(new Event("resize")), 50);
@@ -1111,7 +1232,7 @@ function renderGallery(){
       <img src="${img.src}" alt="${img.titulo}" style="display:none;"
            onload="this.previousElementSibling.style.display='none';this.style.display='block';"
            onerror="this.style.display='none';"/>
-      ${img.nota?.trim()?'<div class="card-note-badge" title="Tiene una dedicatoria">💌</div>':""}
+      ${img.nota?.trim()?`<div class="card-note-badge" title="Ver dedicatoria 💜" onclick="openNoteModal(event,'${img.nota.replace(/'/g,"\\'")}','${img.artista.replace(/'/g,"\\'")}')"><img src="imagenes/ovejas/oveja1.png" alt="💜"/></div>`:""}
       <div class="card-body">
         <div class="card-title">${img.titulo}</div>
         <div class="card-artist">${img.artista}</div>
@@ -1301,11 +1422,13 @@ window.togglePlay=()=>{
 window.nextSong=()=>{
   currentIdx=(currentIdx+1)%CANCIONES.length;
   document.getElementById("mp-title").textContent=CANCIONES[currentIdx].titulo;
+  setTimeout(updateMpTitleScroll,100);
   if(playerInited&&ytPlayer){ ytPlayer.loadVideoById(CANCIONES[currentIdx].youtubeId); isPlaying=true; updateUI(); }
 };
 window.prevSong=()=>{
   currentIdx=(currentIdx-1+CANCIONES.length)%CANCIONES.length;
   document.getElementById("mp-title").textContent=CANCIONES[currentIdx].titulo;
+  setTimeout(updateMpTitleScroll,100);
   if(playerInited&&ytPlayer){ ytPlayer.loadVideoById(CANCIONES[currentIdx].youtubeId); isPlaying=true; updateUI(); }
 };
 window.setVol=v=>{ if(ytPlayer) ytPlayer.setVolume(parseInt(v)); };
