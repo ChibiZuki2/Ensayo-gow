@@ -56,7 +56,7 @@ body::before{content:'';position:fixed;inset:0;z-index:-1;background:linear-grad
 @keyframes bgShift{0%{background-position:0% 50%}50%{background-position:100% 50%}100%{background-position:0% 50%}}
 
 /* ===== GLOW EN CARDS (58) ===== */
-.card{break-inside:avoid;margin-bottom:10px;border-radius:14px;overflow:hidden;border:.5px solid var(--border-c);background:var(--card);transition:transform .25s,border-color .25s,box-shadow .35s,opacity .5s;cursor:pointer;position:relative;opacity:0;transform:translateY(16px)}
+.card{break-inside:avoid;margin-bottom:10px;border-radius:14px;overflow:hidden;border:.5px solid var(--border-c);background:var(--card);transition:transform .35s cubic-bezier(.34,1.56,.64,1),border-color .25s,box-shadow .35s,opacity .5s;cursor:pointer;position:relative;opacity:0;transform:translateY(16px)}
 .card:hover{border-color:rgba(168,85,247,.6);box-shadow:0 0 0 1px rgba(168,85,247,.2),0 8px 30px rgba(123,94,167,.35),0 0 40px rgba(168,85,247,.12)}
 
 /* ===== VINILO GIRATORIO (48) ===== */
@@ -377,10 +377,12 @@ body::before{content:'';position:fixed;inset:0;z-index:-1;background:linear-grad
 /* FILTROS */
 .filter-bar{display:flex;gap:8px;flex-wrap:wrap;padding:1rem 1rem .5rem;align-items:center;position:relative;z-index:1}
 .filter-label{font-size:11px;color:var(--text2);letter-spacing:.04em;margin-right:4px}
-.tag{font-size:12px;padding:5px 16px;border-radius:20px;border:.5px solid var(--tag-border);color:var(--tag-text);background:var(--tag-bg);cursor:pointer;transition:all .15s;font-family:'Inter',sans-serif;user-select:none}
-.tag.active,.tag:hover{background:var(--tag-act-bg);color:var(--tag-act-text)}
-.surprise-btn{font-size:12px;padding:5px 16px;border-radius:20px;margin-left:4px;border:.5px solid var(--accent);background:linear-gradient(135deg,var(--accent),var(--accent-light));color:#fff;cursor:pointer;transition:all .2s;font-family:'Inter',sans-serif;font-weight:500}
-.surprise-btn:hover{transform:scale(1.06) rotate(-2deg);box-shadow:0 4px 16px var(--glow)}
+.tag{font-size:12px;padding:5px 16px;border-radius:20px;border:.5px solid var(--tag-border);color:var(--tag-text);background:var(--tag-bg);cursor:pointer;transition:all .22s cubic-bezier(.34,1.56,.64,1);font-family:'Inter',sans-serif;user-select:none}
+.tag.active,.tag:hover{background:var(--tag-act-bg);color:var(--tag-act-text);transform:scale(1.05);letter-spacing:.03em}
+.surprise-btn{font-size:12px;padding:5px 16px;border-radius:20px;margin-left:4px;border:.5px solid var(--accent);background:linear-gradient(135deg,var(--accent),var(--accent-light));color:#fff;cursor:pointer;transition:all .25s cubic-bezier(.34,1.56,.64,1);font-family:'Inter',sans-serif;font-weight:500;position:relative;overflow:hidden}
+.surprise-btn::after{content:'';position:absolute;inset:0;background:linear-gradient(90deg,transparent 30%,rgba(255,255,255,.25) 50%,transparent 70%);transform:translateX(-100%);transition:transform .4s ease}
+.surprise-btn:hover{transform:scale(1.06) rotate(-2deg);box-shadow:0 4px 18px var(--glow)}
+.surprise-btn:hover::after{transform:translateX(100%)}
 
 /* STATS */
 .stats{display:flex;gap:1.5rem;padding:.5rem 1rem 1rem;align-items:center;position:relative;z-index:1}
@@ -392,12 +394,11 @@ body::before{content:'';position:fixed;inset:0;z-index:-1;background:linear-grad
 .masonry{column-count:3;column-gap:10px}
 @media(max-width:600px){.masonry{column-count:2}}
 @media(max-width:380px){.masonry{column-count:1}}
-.card{break-inside:avoid;margin-bottom:10px;border-radius:14px;overflow:hidden;border:.5px solid var(--border-c);background:var(--card);transition:transform .25s,border-color .25s,box-shadow .25s,opacity .5s;cursor:pointer;position:relative;opacity:0;transform:translateY(16px)}
+.card{break-inside:avoid;margin-bottom:10px;border-radius:14px;overflow:hidden;border:.5px solid var(--border-c);background:var(--card);transition:transform .35s cubic-bezier(.34,1.56,.64,1),border-color .25s,box-shadow .35s,opacity .5s;cursor:pointer;position:relative;opacity:0;transform:translateY(16px)}
 .card.visible{opacity:1;transform:translateY(0)}
-.card-note-badge{position:absolute;top:8px;right:8px;z-index:2;width:30px;height:30px;border-radius:50%;background:rgba(15,9,26,.65);backdrop-filter:blur(4px);display:flex;align-items:center;justify-content:center;padding:3px;transition:transform .2s}
+.card-note-badge{position:absolute;top:8px;right:8px;z-index:2;width:28px;height:28px;border-radius:50%;background:rgba(15,9,26,.65);backdrop-filter:blur(4px);display:flex;align-items:center;justify-content:center;font-size:14px;transition:transform .2s}
 .card-note-badge:hover{transform:scale(1.15)}
-.card-note-badge img{width:100%;height:100%;object-fit:contain;filter:drop-shadow(0 0 4px rgba(201,168,232,.6))}
-.card:hover{transform:translateY(-5px);border-color:var(--accent);box-shadow:0 8px 24px var(--glow)}
+.card:hover{transform:translateY(-5px) scale(1.01);border-color:rgba(168,85,247,.6);box-shadow:0 0 0 1px rgba(168,85,247,.2),0 12px 32px rgba(123,94,167,.4),0 0 50px rgba(168,85,247,.1)}
 .card img{width:100%;display:block}
 .card-placeholder{width:100%;display:flex;align-items:center;justify-content:center;font-size:28px;background:var(--bg2)}
 .card-body{padding:8px 12px 10px}
@@ -416,7 +417,7 @@ body::before{content:'';position:fixed;inset:0;z-index:-1;background:linear-grad
 .lightbox-info h3{font-size:15px;font-weight:500}
 .lightbox-info p{font-size:13px;color:var(--text2);margin-top:3px}
 .lb-note{display:none;max-width:480px;margin:12px auto 0;background:rgba(123,94,167,.15);border:.5px solid var(--tag-border);border-radius:14px;padding:10px 18px;font-size:12.5px;color:var(--text);line-height:1.5;font-style:italic}
-.lb-note::before{content:"";display:inline-block;width:20px;height:20px;background:url('imagenes/ovejas/oveja1.png') center/contain no-repeat;vertical-align:middle;margin-right:6px;filter:drop-shadow(0 0 4px rgba(201,168,232,.5))}
+.lb-note::before{content:"🐑 ";font-style:normal}
 .lb-note.show{display:block}
 
 /* REDES SOCIALES */
@@ -425,7 +426,23 @@ body::before{content:'';position:fixed;inset:0;z-index:-1;background:linear-grad
 .social-links{display:flex;justify-content:center;gap:14px;flex-wrap:wrap}
 .social-link{display:flex;align-items:center;gap:7px;padding:9px 18px;border-radius:30px;border:.5px solid var(--tag-border);background:var(--tag-bg);color:var(--tag-text);text-decoration:none;font-size:12px;letter-spacing:.03em;transition:all .2s}
 .social-link:hover{background:var(--tag-act-bg);color:var(--tag-act-text);transform:translateY(-3px);box-shadow:0 6px 18px var(--glow)}
-.social-icon{display:flex;align-items:center}
+.discord-link{border-color:rgba(88,101,242,.5);color:#8b9cff}
+.discord-link:hover{background:rgba(88,101,242,.15);color:#fff;box-shadow:0 6px 18px rgba(88,101,242,.35)}
+.email-link{border-color:rgba(201,168,232,.4)}
+
+/* ===== BANNER DE DISCORD ===== */
+.discord-banner{display:flex;align-items:center;gap:20px;max-width:600px;margin:1.6rem auto 0;background:linear-gradient(135deg,rgba(88,101,242,.15),rgba(123,94,167,.2));border:.5px solid rgba(88,101,242,.35);border-radius:20px;padding:1.2rem 1.5rem;text-decoration:none;transition:transform .3s cubic-bezier(.34,1.56,.64,1),box-shadow .3s,border-color .3s;overflow:hidden;position:relative}
+.discord-banner::before{content:'';position:absolute;inset:0;background:linear-gradient(90deg,transparent,rgba(88,101,242,.08),transparent);opacity:0;transition:opacity .3s}
+.discord-banner:hover{transform:translateY(-4px) scale(1.01);box-shadow:0 12px 36px rgba(88,101,242,.3);border-color:rgba(88,101,242,.6)}
+.discord-banner:hover::before{opacity:1}
+.discord-banner-img{width:90px;height:90px;object-fit:contain;flex-shrink:0;filter:drop-shadow(0 4px 12px rgba(88,101,242,.4));transition:transform .3s cubic-bezier(.34,1.56,.64,1)}
+.discord-banner:hover .discord-banner-img{transform:scale(1.08) rotate(-3deg)}
+.discord-banner-text{flex:1;min-width:0}
+.discord-banner-title{font-family:'Cinzel',serif;font-size:16px;color:#E8DEFF;letter-spacing:.08em;margin-bottom:4px}
+.discord-banner-sub{font-size:12px;color:var(--text2);line-height:1.6;margin-bottom:10px}
+.discord-banner-btn{display:inline-flex;align-items:center;gap:6px;background:linear-gradient(135deg,#5865F2,#7289da);color:#fff;font-size:12px;font-weight:600;padding:7px 16px;border-radius:20px;letter-spacing:.04em;box-shadow:0 4px 12px rgba(88,101,242,.4);transition:box-shadow .2s}
+.discord-banner:hover .discord-banner-btn{box-shadow:0 6px 20px rgba(88,101,242,.6)}
+@media(max-width:500px){.discord-banner{flex-direction:column;text-align:center}.discord-banner-img{width:70px;height:70px}}
 
 /* FOOTER */
 footer{text-align:center;padding:2rem 1.5rem 6rem;border-top:.5px solid var(--border-c);font-size:11px;color:var(--text2);letter-spacing:.06em;position:relative;z-index:1}
@@ -778,7 +795,7 @@ input[type=range].mp-vol::-webkit-slider-thumb{-webkit-appearance:none;width:10p
 </div>
 
 <div class="social-section">
-  <div class="social-title">Sígueme en</div>
+  <div class="social-title">Encuéntrame en</div>
   <div class="social-links">
     <a class="social-link" href="https://www.twitch.tv/ladygowi" target="_blank" rel="noopener">
       <span class="social-icon"><svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M11.64 5.93h1.43v4.28h-1.43m3.93-4.28H17v4.28h-1.43M7 2 3.43 5.57v12.86h4.28V22l3.58-3.57h2.85L20.57 12V2zm12.14 9.29-2.85 2.85h-2.86l-2.5 2.5v-2.5H7.71V3.43h11.43Z"/></svg></span>
@@ -792,7 +809,25 @@ input[type=range].mp-vol::-webkit-slider-thumb{-webkit-appearance:none;width:10p
       <span class="social-icon"><svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M16.6 5.82s.51.5 0 0A4.28 4.28 0 0 1 15.54 3h-3.09v12.4a2.59 2.59 0 0 1-2.59 2.5c-1.42 0-2.6-1.16-2.6-2.6 0-1.72 1.66-3.01 3.37-2.48V9.66c-3.45-.46-6.47 2.22-6.47 5.64 0 3.33 2.76 5.7 5.69 5.7 3.14 0 5.69-2.55 5.69-5.7V9.01a7.35 7.35 0 0 0 4.3 1.38V7.3s-1.88.09-3.24-1.48Z"/></svg></span>
       <span class="social-label">TikTok</span>
     </a>
+    <a class="social-link discord-link" href="https://discord.gg/hrmRzHZbcJ" target="_blank" rel="noopener">
+      <span class="social-icon"><svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M20.317 4.37a19.791 19.791 0 0 0-4.885-1.515.074.074 0 0 0-.079.037c-.21.375-.444.864-.608 1.25a18.27 18.27 0 0 0-5.487 0 12.64 12.64 0 0 0-.617-1.25.077.077 0 0 0-.079-.037A19.736 19.736 0 0 0 3.677 4.37a.07.07 0 0 0-.032.027C.533 9.046-.32 13.58.099 18.057a.082.082 0 0 0 .031.057 19.9 19.9 0 0 0 5.993 3.03.078.078 0 0 0 .084-.028c.462-.63.874-1.295 1.226-1.994a.076.076 0 0 0-.041-.106 13.107 13.107 0 0 1-1.872-.892.077.077 0 0 1-.008-.128 10.2 10.2 0 0 0 .372-.292.074.074 0 0 1 .077-.01c3.928 1.793 8.18 1.793 12.062 0a.074.074 0 0 1 .078.01c.12.098.246.198.373.292a.077.077 0 0 1-.006.127 12.299 12.299 0 0 1-1.873.892.077.077 0 0 0-.041.107c.36.698.772 1.362 1.225 1.993a.076.076 0 0 0 .084.028 19.839 19.839 0 0 0 6.002-3.03.077.077 0 0 0 .032-.054c.5-5.177-.838-9.674-3.549-13.66a.061.061 0 0 0-.031-.03zM8.02 15.33c-1.183 0-2.157-1.085-2.157-2.419 0-1.333.956-2.419 2.157-2.419 1.21 0 2.176 1.096 2.157 2.42 0 1.333-.956 2.418-2.157 2.418zm7.975 0c-1.183 0-2.157-1.085-2.157-2.419 0-1.333.955-2.419 2.157-2.419 1.21 0 2.176 1.096 2.157 2.42 0 1.333-.946 2.418-2.157 2.418Z"/></svg></span>
+      <span class="social-label">Discord</span>
+    </a>
+    <a class="social-link email-link" href="mailto:lasectagow@gmail.com">
+      <span class="social-icon"><svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M20 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4-8 5-8-5V6l8 5 8-5v2z"/></svg></span>
+      <span class="social-label">Contacto</span>
+    </a>
   </div>
+
+  <!-- Banner de Discord -->
+  <a class="discord-banner" href="https://discord.gg/hrmRzHZbcJ" target="_blank" rel="noopener">
+    <img class="discord-banner-img" src="imagenes/discord-gowi.png" alt="LadyGowi Discord"/>
+    <div class="discord-banner-text">
+      <div class="discord-banner-title">¡Únete a la Secta! 🐑</div>
+      <div class="discord-banner-sub">Entra a nuestro Discord y sé parte de la comunidad de LadyGowi 💜</div>
+      <div class="discord-banner-btn">Entrar al Discord ✦</div>
+    </div>
+  </a>
 </div>
 
 <footer>
@@ -935,7 +970,7 @@ function openNoteModal(e, nota, artista){
     <div style="background:var(--card);border:.5px solid rgba(201,168,232,.35);border-radius:20px;padding:1.6rem 1.8rem;max-width:400px;width:100%;animation:sectionIn .3s ease both;position:relative">
       <button onclick="closeNoteModal()" style="position:absolute;top:10px;right:12px;background:none;border:none;color:var(--text2);font-size:18px;cursor:pointer;line-height:1">✕</button>
       <div style="display:flex;align-items:center;gap:10px;margin-bottom:1rem">
-        <img src="imagenes/ovejas/oveja1.png" style="width:36px;height:36px;object-fit:contain;filter:drop-shadow(0 0 6px rgba(201,168,232,.5))"/>
+        <div style="font-size:28px;filter:drop-shadow(0 0 6px rgba(201,168,232,.5))">🐑</div>
         <div>
           <div style="font-size:13px;font-weight:600;color:var(--text)">Dedicatoria</div>
           <div style="font-size:11px;color:var(--text2)">${artista}</div>
@@ -963,7 +998,7 @@ function closeNoteModal(){
     bubble.innerHTML=`<span style="font-weight:600">${main}</span><br><span style="font-size:11px;opacity:.8">${sub}</span>`;
     bubble.classList.add("show");
     clearTimeout(bubbleTimer);
-    bubbleTimer=setTimeout(()=>bubble.classList.remove("show"), 5000);
+    bubbleTimer=setTimeout(()=>bubble.classList.remove("show"), 9000);
   }, 900);
 })();
 
@@ -1232,7 +1267,7 @@ function renderGallery(){
       <img src="${img.src}" alt="${img.titulo}" style="display:none;"
            onload="this.previousElementSibling.style.display='none';this.style.display='block';"
            onerror="this.style.display='none';"/>
-      ${img.nota?.trim()?`<div class="card-note-badge" title="Ver dedicatoria 💜" onclick="openNoteModal(event,'${img.nota.replace(/'/g,"\\'")}','${img.artista.replace(/'/g,"\\'")}')"><img src="imagenes/ovejas/oveja1.png" alt="💜"/></div>`:""}
+      ${img.nota?.trim()?`<div class="card-note-badge" title="Ver dedicatoria 💜" onclick="openNoteModal(event,'${img.nota.replace(/'/g,"\\'")}','${img.artista.replace(/'/g,"\\'")}')">🐑</div>`:""}
       <div class="card-body">
         <div class="card-title">${img.titulo}</div>
         <div class="card-artist">${img.artista}</div>
