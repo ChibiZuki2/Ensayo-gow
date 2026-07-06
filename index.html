@@ -823,7 +823,7 @@ input[type=range].mp-vol::-webkit-slider-thumb{-webkit-appearance:none;width:10p
   <a class="discord-banner" href="https://discord.gg/hrmRzHZbcJ" target="_blank" rel="noopener">
     <img class="discord-banner-img" src="imagenes/discord-gowi.png" alt="LadyGowi Discord"/>
     <div class="discord-banner-text">
-      <div class="discord-banner-title">¡Únete al rebaño! 🐑</div>
+      <div class="discord-banner-title">¡Únete a la Secta! 🐑</div>
       <div class="discord-banner-sub">Entra a nuestro Discord y sé parte de la comunidad de LadyGowi 💜</div>
       <div class="discord-banner-btn">Entrar al Discord ✦</div>
     </div>
@@ -883,20 +883,49 @@ if(window._dataJsError){
 (function initCountdown(){
   const bar=document.getElementById("countdown-bar");
   const banner=document.getElementById("bday-banner");
+  const confDiv=document.getElementById("bday-confetti");
   if(!bar||!banner) return;
   function tick(){
     const now=new Date();
-    const isToday=(now.getMonth()+1===BDAY_MONTH&&now.getDate()===BDAY_DAY);
-    if(isToday){ banner.classList.add("show"); bar.classList.remove("show"); return; }
+    const isToday=(now.getMonth()+1===BDAY_MONTH && now.getDate()===BDAY_DAY);
+    if(isToday){
+      banner.classList.add("show");
+      bar.classList.remove("show");
+      if(confDiv && !confDiv.children.length){
+        for(let i=0;i<30;i++){
+          const p=document.createElement("div"); p.className="conf-piece";
+          p.style.left=Math.random()*100+"%";
+          p.style.background=["#C9A8E8","#A87FD4","#FFD4F5","#7B5EA7","#ffffff"][Math.floor(Math.random()*5)];
+          p.style.animationDelay=(Math.random()*2.5)+"s";
+          p.style.animationDuration=(2+Math.random()*2)+"s";
+          confDiv.appendChild(p);
+        }
+        const rain=document.getElementById("heart-rain");
+        if(rain){ rain.classList.add("show");
+          const HEARTS=["💜","💖","🩷","✨","💕"];
+          function dropHeart(){ const h=document.createElement("div"); h.className="heart-drop";
+            h.textContent=HEARTS[Math.floor(Math.random()*HEARTS.length)];
+            h.style.left=Math.random()*100+"%"; h.style.fontSize=(14+Math.random()*16)+"px";
+            const dur=5+Math.random()*4; h.style.animationDuration=dur+"s";
+            rain.appendChild(h); setTimeout(()=>h.remove(),dur*1000+200); }
+          for(let i=0;i<12;i++) setTimeout(dropHeart,i*250);
+          setInterval(dropHeart,700);
+        }
+      }
+      return;
+    }
     let next=new Date(now.getFullYear(),BDAY_MONTH-1,BDAY_DAY,0,0,0);
-    if(next<now) next=new Date(now.getFullYear()+1,BDAY_MONTH-1,BDAY_DAY,0,0,0);
+    if(next<=now) next=new Date(now.getFullYear()+1,BDAY_MONTH-1,BDAY_DAY,0,0,0);
     const diff=next-now;
     const days=Math.floor(diff/86400000);
     const hours=Math.floor((diff%86400000)/3600000);
     const mins=Math.floor((diff%3600000)/60000);
-    document.getElementById("cd-days").textContent=days;
-    document.getElementById("cd-hours").textContent=hours;
-    document.getElementById("cd-mins").textContent=mins;
+    const dEl=document.getElementById("cd-days");
+    const hEl=document.getElementById("cd-hours");
+    const mEl=document.getElementById("cd-mins");
+    if(dEl) dEl.textContent=days;
+    if(hEl) hEl.textContent=hours;
+    if(mEl) mEl.textContent=mins;
     bar.classList.add("show");
   }
   tick();
