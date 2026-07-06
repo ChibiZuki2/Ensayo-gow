@@ -879,7 +879,7 @@ if(window._dataJsError){
 }
 </script>
 <script>
-/* ==== CUMPLEAÑOS / CUENTA REGRESIVA ==== */
+/* ==== CUMPLEAÑOS / CUENTA REGRESIVA ==== */ (function initCountdown(){   const bar=document.getElementById("countdown-bar");   const banner=document.getElementById("bday-banner");   if(!bar||!banner) return;   function tick(){     const now=new Date();     const isToday=(now.getMonth()+1===BDAY_MONTH&&now.getDate()===BDAY_DAY);     if(isToday){ banner.classList.add("show"); bar.classList.remove("show"); return; }     let next=new Date(now.getFullYear(),BDAY_MONTH-1,BDAY_DAY,0,0,0);     if(next<now) next=new Date(now.getFullYear()+1,BDAY_MONTH-1,BDAY_DAY,0,0,0);     const diff=next-now;     const days=Math.floor(diff/86400000);     const hours=Math.floor((diff%86400000)/3600000);     const mins=Math.floor((diff%3600000)/60000);     document.getElementById("cd-days").textContent=days;     document.getElementById("cd-hours").textContent=hours;     document.getElementById("cd-mins").textContent=mins;     bar.classList.add("show");   }   tick();   setInterval(tick,60000); })(); 
 const REC_LABEL = { si:"✅ Recomienda", no:"❌ No recomienda", tal:"🤔 Tal vez" };
 
 /* bubbleTimer declarado aquí para que showGreeting lo pueda usar */
